@@ -21,7 +21,7 @@
         <wsdl.directory>src/main/resources</wsdl.directory>
         <wsdl.filename>broker.1_0.wsdl</wsdl.filename>
 
-        <mainclass>pt.upa.broker.BrokerApplication</mainclass>
+        <mainclass>pt.upa.broker.ws.BrokerApplication</mainclass>
 
         <ws.url>http://localhost:8080/broker-ws/endpoint</ws.url>
 
@@ -30,6 +30,12 @@
     </properties>
 
     <dependencies>
+				 <!-- UDDI Naming -->
+				<dependency>
+				    <groupId>pt.ulisboa.tecnico.sdis</groupId>
+				    <artifactId>uddi-naming</artifactId>
+				    <version>1.0</version>
+				</dependency>
         <!-- JAX-WS -->
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
