@@ -12,7 +12,8 @@ import java.util.List;
     targetNamespace="http://ws.broker.upa.pt/",
     serviceName="BrokerService"
 )
-public class BrokerPort {
+
+public class BrokerPort implements BrokerPortType{
 
 	public String ping (String name) {
 		return "Method ping() was called with name parameter: "+name;

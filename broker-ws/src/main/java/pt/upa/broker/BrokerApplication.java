@@ -3,6 +3,7 @@ package pt.upa.broker;
 import javax.xml.ws.Endpoint;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
+import pt.upa.broker.ws.BrokerPort;
 
 public class BrokerApplication {
 
