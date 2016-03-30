@@ -1,18 +1,18 @@
 # Projeto de Sistemas Distribuídos 2015-2016 #
 
-Grupo de SD ... - Campus ...
+Grupo de SD .49 - Campus Alameda
 *(preencher com número do grupo de SD no Fénix e depois apagar esta linha)*
 
-... ... ...
+58803 Gonçalo Gaspar
 
-... ... ...
+79715 António Silva
 
-... ... ...
+70012 Filpe Cruzinha
 *(preencher com nome, número e email de membro do grupo e depois apagar esta linha)*
 
 
 Repositório:
-[tecnico-distsys/C_XX-project](https://github.com/tecnico-distsys/C_XX-project/)
+[tecnico-distsys/C_49-project](https://github.com/tecnico-distsys/C_49-project/)
 
 -------------------------------------------------------------------------------
 
@@ -23,15 +23,15 @@ Repositório:
 
 [0] Iniciar sistema operativo
 
-Indicar Windows ou Linux
-*(escolher um dos dois, que esteja disponível nos laboratórios, e depois apagar esta linha)*
+Linux
 
 
 [1] Iniciar servidores de apoio
 
 JUDDI:
 ```
-...
+cd juddi/bin
+./startup.sh
 ```
 
 

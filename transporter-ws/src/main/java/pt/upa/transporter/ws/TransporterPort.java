@@ -1,6 +1,55 @@
 package pt.upa.transporter.ws;
 
-public class TransporterPort {
+import java.util.List;
+
+import javax.jws.WebService;
+
+@WebService(
+	    endpointInterface="example.ws.TransporterPortType",
+	    wsdlLocation="Transport.wsdl",
+	    name="Transporter",
+	    portName="TransporterPort",
+	    targetNamespace="http://ws.transporter.upa.pt/",
+	    serviceName="TransporterService"
+	)
+public class TransporterPort implements TransporterPortType{
+
+	@Override
+	public String ping(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public JobView requestJob(String origin, String destination, int price)
+			throws BadLocationFault_Exception, BadPriceFault_Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public JobView decideJob(String id, boolean accept) throws BadJobFault_Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public JobView jobStatus(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<JobView> listJobs() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void clearJobs() {
+		// TODO Auto-generated method stub
+		
+	}
 
 	// TODO
 
