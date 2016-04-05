@@ -27,7 +27,7 @@ public class TransporterApplication {
 		UDDINaming uddiNaming = null;
 		
 		try {
-			TransporterPort port = new TransporterPort();
+			TransporterPort port = new TransporterPort(name);
 			endpoint = Endpoint.create(port);
 
 			// publish endpoint
