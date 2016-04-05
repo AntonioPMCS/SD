@@ -124,5 +124,5 @@ exec "$JAVACMD" $JAVA_OPTS  \
   -Dapp.repo="$REPO" \
   -Dapp.home="$BASEDIR" \
   -Dbasedir="$BASEDIR" \
-  pt.upa.broker.BrokerApplication \
+  pt.upa.broker.ws.BrokerApplication \
   "$@"

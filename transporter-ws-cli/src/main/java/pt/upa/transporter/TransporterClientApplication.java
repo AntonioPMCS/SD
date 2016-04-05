@@ -50,6 +50,7 @@ public class TransporterClientApplication {
 		Map<String, Object> requestContext = bindingProvider.getRequestContext();
 		requestContext.put(ENDPOINT_ADDRESS_PROPERTY, endpointAddress);
 
+		//Server action
 		try {
 			String result = port.ping("friend");
 			System.out.println(result);

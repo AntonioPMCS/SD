@@ -24,7 +24,7 @@
         <mainclass>pt.upa.transporter.TransporterApplication</mainclass>
 
         <!-- instance number - redefine using -D option - e.g. mvn -Dws.i=2 exec:java -->
-        <ws.i>1</ws.i>
+        <ws.i>2</ws.i>
 
         <ws.host>localhost</ws.host>
         <ws.port>808${ws.i}</ws.port>

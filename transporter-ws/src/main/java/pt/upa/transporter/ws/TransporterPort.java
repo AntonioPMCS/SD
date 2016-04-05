@@ -5,19 +5,19 @@ import java.util.List;
 import javax.jws.WebService;
 
 @WebService(
-	    endpointInterface="example.ws.TransporterPortType",
-	    wsdlLocation="Transport.wsdl",
-	    name="Transporter",
+	    endpointInterface="pt.upa.transporter.ws.TransporterPortType",
+	    wsdlLocation="transporter.1_0.wsdl",
+	    name="TransporterWebService",
 	    portName="TransporterPort",
 	    targetNamespace="http://ws.transporter.upa.pt/",
 	    serviceName="TransporterService"
 	)
+
 public class TransporterPort implements TransporterPortType{
 
 	@Override
 	public String ping(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return "Return from ping method...received parameter: "+name;
 	}
 
 	@Override

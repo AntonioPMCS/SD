@@ -21,9 +21,13 @@
         <wsdl.directory>${basedir}/../transporter-ws/src/main/resources</wsdl.directory>
         <wsdl.filename>transporter.1_0.wsdl</wsdl.filename>
 
+		<!-- instance number - redefine using -D option - e.g. mvn -Dws.i=2 exec:java -->
+		<ws.i>2</ws.i>
+		
         <mainclass>pt.upa.transporter.TransporterClientApplication</mainclass>
 
-        <ws.name>UpaTransporter</ws.name>
+        <ws.name>UpaTransporter${ws.i}</ws.name>
+        
         <uddi.url>http://localhost:9090</uddi.url>
     </properties>
 
@@ -124,7 +128,8 @@
                     <killAfter>-1</killAfter>
                     <mainClass>${mainclass}</mainClass>
                     <arguments>
-                        <argument>${ws.url}</argument>
+                        <argument>${uddi.url}</argument>
+                        <argument>${ws.name}</argument>
                     </arguments>
                 </configuration>
             </plugin>

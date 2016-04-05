@@ -9,6 +9,7 @@ public class TransporterApplication {
 
 	//TODO: main copied from ping application example...that's not right!!!
 	public static void main(String[] args) throws Exception {
+		
 		System.out.println(TransporterApplication.class.getSimpleName() + " starting...");
 		
 		// Check arguments
@@ -24,6 +25,7 @@ public class TransporterApplication {
 
 		Endpoint endpoint = null;
 		UDDINaming uddiNaming = null;
+		
 		try {
 			TransporterPort port = new TransporterPort();
 			endpoint = Endpoint.create(port);

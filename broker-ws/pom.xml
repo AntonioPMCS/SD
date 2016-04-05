@@ -18,10 +18,10 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <wsdl.directory>src/main/resources</wsdl.directory>
+        <wsdl.directory>${basedir}/src/main/resources</wsdl.directory>
         <wsdl.filename>broker.1_0.wsdl</wsdl.filename>
 
-        <mainclass>pt.upa.broker.ws.BrokerApplication</mainclass>
+        <mainclass>pt.upa.broker.BrokerApplication</mainclass>
 
         <ws.url>http://localhost:8080/broker-ws/endpoint</ws.url>
 
