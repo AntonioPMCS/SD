@@ -1,11 +1,10 @@
 package pt.upa.transporter.ws;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.jws.WebService;
-
-import org.apache.commons.lang.ArrayUtils;
 
 @WebService(
 	    endpointInterface="pt.upa.transporter.ws.TransporterPortType",
@@ -61,6 +60,8 @@ public class TransporterPort implements TransporterPortType{
 		if(price > 100){
 			return null;
 		}
+		
+		
 		if(!workingZoneLocation(origin) || !workingZoneLocation(destination)){
 			return null;
 		}
@@ -75,7 +76,7 @@ public class TransporterPort implements TransporterPortType{
 		}
 		else{
 			//TODO: Check if intervals are right
-			offerPrice = ThreadLocalRandom.current().nextInt(10, price);
+			offerPrice = ThreadLocalRandom.current().nextInt(1, price);
 		}
 		
 		//Create job with Proposed status
@@ -138,9 +139,9 @@ public class TransporterPort implements TransporterPortType{
 	 * @return boolean True if location exists, false otherwise
 	 */
 	public boolean locationExists(String location){
-		return ArrayUtils.contains(center,location) ||
-				ArrayUtils.contains(south,location) ||
-				ArrayUtils.contains(north,location);
+		return Arrays.asList(center).contains(location) ||
+				Arrays.asList(south).contains(location) ||
+				Arrays.asList(north).contains(location);
 	}
 	
 	/**
@@ -151,12 +152,12 @@ public class TransporterPort implements TransporterPortType{
 	 * @return knowsLocation True if location belong to working zone, false otherwise.
 	 */
 	public boolean workingZoneLocation(String location){
-		boolean knowsLocation = ArrayUtils.contains(center,location);
+		boolean knowsLocation = Arrays.asList(center).contains(location);
 		if(pair && !knowsLocation){
-			knowsLocation = ArrayUtils.contains(north, location);
+			knowsLocation = Arrays.asList(north).contains(location);
 		}
-		else{
-			knowsLocation = ArrayUtils.contains(south, location);
+		else if(!pair && !knowsLocation){
+			knowsLocation = Arrays.asList(south).contains(location);
 		}
 		
 		return knowsLocation;
@@ -181,7 +182,7 @@ public class TransporterPort implements TransporterPortType{
 		//Decide upon the offer
 		//Price is raised when transporter is pair and price not pair
 		//of vice-versa -> XOR between them!
-		if(price > 10 || (pair ^ priceIsPair)){
+		if(price > 10 && (pair ^ priceIsPair)){
 			raisePrice = true;
 		}
 		

@@ -22,6 +22,7 @@ pt/upa/broker/ws/UnavailableTransportFault.class
 pt/upa/broker/ws/UnknownTransportFault_Exception.class
 pt/upa/broker/ws/ListTransports.class
 pt/upa/broker/ws/BrokerService.class
+pt/upa/broker/BrokerApplication.class
 pt/upa/broker/ws/UnknownLocationFault.class
 pt/upa/broker/ws/UnavailableTransportPriceFault.class
 pt/upa/broker/ws/ClearTransports.class
