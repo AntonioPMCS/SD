@@ -6,6 +6,8 @@ import java.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.jws.WebService;
 
+import pt.upa.transporter.TransporterEndpointManager;
+
 @WebService(
 	    endpointInterface="pt.upa.transporter.ws.TransporterPortType",
 	    wsdlLocation="transporter.1_0.wsdl",
@@ -24,6 +26,7 @@ public class TransporterPort implements TransporterPortType{
 	
 	private static long id = 0;
 	private Vector<JobView> jobs = new Vector<JobView>(); //Vector for concurrency?!
+	
 	
 	
 	
@@ -103,7 +106,6 @@ public class TransporterPort implements TransporterPortType{
 			}
 		}
 		
-		//TODO: Verify BadJobFault constructor.
 		if(!jobFound){
 			throw new BadJobFault_Exception("Job with id: #"+id+" doesn't exist!", new BadJobFault());
 		}
