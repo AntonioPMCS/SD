@@ -1,15 +1,16 @@
-package pt.upa.transporter;
+package pt.upa.broker;
 
 import java.io.IOException;
 
+import javax.xml.registry.JAXRException;
 import javax.xml.ws.Endpoint;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
-import pt.upa.transporter.ws.TransporterPort;
-import pt.upa.transporter.ws.TransporterPortType;
+import pt.upa.broker.ws.BrokerPort;
+import pt.upa.broker.ws.BrokerPortType;
 
-public class TransporterEndpointManager {
-
+public class BrokerEndpointManager {
+	
 	/** UDDI naming server location */
 	private String uddiURL = null;
 	/** Web Service name */
@@ -24,10 +25,10 @@ public class TransporterEndpointManager {
 	private String wsURL = null;
 
 	/** Port implementation */
-	private TransporterPort portImpl;
+	private BrokerPort portImpl;
 
 	/** Obtain Port implementation */
-	public TransporterPortType getPort() {
+	public BrokerPortType getPort() {
 		return portImpl;
 	}
 
@@ -37,7 +38,7 @@ public class TransporterEndpointManager {
 	private UDDINaming uddiNaming = null;
 
 	/** Get UDDI Naming instance for contacting UDDI server */
-	UDDINaming getUddiNaming() {
+	public UDDINaming getUddiNaming() {
 		return uddiNaming;
 	}
 
@@ -52,16 +53,18 @@ public class TransporterEndpointManager {
 		this.verbose = verbose;
 	}
 
-	/** constructor with provided UDDI location, WS name, and WS URL */
-	public TransporterEndpointManager(String uddiURL, String wsName, String wsURL) {
+	/** constructor with provided UDDI location, WS name, and WS URL 
+	 * @throws JAXRException */
+	public BrokerEndpointManager(String uddiURL, String wsName, String wsURL) throws JAXRException {
 		this.uddiURL = uddiURL;
 		this.wsName = wsName;
 		this.wsURL = wsURL;
-		portImpl = new TransporterPort(wsName);
+		portImpl = new BrokerPort(wsName, this);
+		
 	}
 
 	/** constructor with provided web service URL */
-	public TransporterEndpointManager(String wsURL) {
+	public BrokerEndpointManager(String wsURL) {
 		if (wsURL == null)
 			throw new NullPointerException("Web Service URL cannot be null!");
 		this.wsURL = wsURL;
@@ -155,6 +158,4 @@ public class TransporterEndpointManager {
 			}
 		}
 	}
-	
-	
 }
