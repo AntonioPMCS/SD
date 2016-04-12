@@ -36,5 +36,7 @@ public class TransporterClientApplication {
 			client = new TransporterClient(uddiURL, wsName);
 		}
 		
+		System.out.println(client.ping("HELLO"));
+		
 	}
 }

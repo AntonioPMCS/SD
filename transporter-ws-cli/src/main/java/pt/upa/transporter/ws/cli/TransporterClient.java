@@ -108,6 +108,7 @@ public class TransporterClient implements TransporterPortType{
 		}
 	}
 	
+	//TODO: CAN'T BE PUBLIC!!!right?
 	public String getWsName(){
 		return wsName;
 	}
