@@ -1,5 +1,6 @@
 /home/goncalo/Desktop/SD/A_49-project/broker-ws/target/generated-sources/wsimport/pt/upa/broker/ws/InvalidPriceFault.java
 /home/goncalo/Desktop/SD/A_49-project/broker-ws/target/generated-sources/wsimport/pt/upa/broker/ws/ListTransports.java
+/home/goncalo/Desktop/SD/A_49-project/broker-ws/src/main/java/pt/upa/broker/BrokerEndpointManager.java
 /home/goncalo/Desktop/SD/A_49-project/broker-ws/target/generated-sources/wsimport/pt/upa/broker/ws/RequestTransport.java
 /home/goncalo/Desktop/SD/A_49-project/broker-ws/target/generated-sources/wsimport/pt/upa/broker/ws/package-info.java
 /home/goncalo/Desktop/SD/A_49-project/broker-ws/target/generated-sources/wsimport/pt/upa/broker/ws/UnavailableTransportFault.java

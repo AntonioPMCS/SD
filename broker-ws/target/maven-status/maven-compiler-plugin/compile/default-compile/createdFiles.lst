@@ -2,6 +2,7 @@ pt/upa/broker/ws/TransportStateView.class
 pt/upa/broker/ws/UnavailableTransportPriceFault_Exception.class
 pt/upa/broker/ws/ViewTransportResponse.class
 pt/upa/broker/ws/RequestTransport.class
+pt/upa/broker/BrokerEndpointManager.class
 pt/upa/broker/ws/InvalidPriceFault_Exception.class
 pt/upa/broker/ws/UnavailableTransportFault_Exception.class
 pt/upa/broker/ws/TransportView.class

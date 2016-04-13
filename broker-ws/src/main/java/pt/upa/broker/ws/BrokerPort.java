@@ -2,9 +2,9 @@ package pt.upa.broker.ws;
 
 import javax.jws.WebService;
 import javax.xml.registry.JAXRException;
-import javax.xml.ws.Endpoint;
 
 import pt.upa.broker.BrokerEndpointManager;
+import pt.upa.transporter.ws.BadJobFault_Exception;
 import pt.upa.transporter.ws.BadLocationFault_Exception;
 import pt.upa.transporter.ws.BadPriceFault_Exception;
 import pt.upa.transporter.ws.JobView;
@@ -68,24 +68,71 @@ public class BrokerPort implements BrokerPortType{
 	
 		
 		try{
+			ArrayList<TransportView> tempTransports = new ArrayList<TransportView>();
+			
 			for(TransporterClient transporter : transporterClients){
+				
+				//CREATE REQUESTS
+				TransportView transport = getTransportView(origin, destination, price, transporter.getWsName(), null);
+				tempTransports.add(transport);
+				
+				
+				//SEND REQUEST
 				JobView newJob = transporter.requestJob(origin, destination, price);
+				
 				if(newJob == null && price > 100)
-					throw new UnavailableTransportFault_Exception("ERROR: Transporter doesn't operate on request areas", new UnavailableTransportFault());
-				else if(newJob == null)
 					throw new UnavailableTransportPriceFault_Exception("ERROR: Price request too high.", new UnavailableTransportPriceFault());
+				else if(newJob == null)
+					throw new UnavailableTransportFault_Exception("ERROR: Transporter doesn't operate on request areas.", new UnavailableTransportFault());
 				
-				//TODO: Criar lista temporário onde recebes todos os job's
-				// No final do for, percorrer a lista temporária e escolhes o com o preço mais baixo
-				// criando um TransportView e fazendo decide job true para essa transportadoa e negativo para as outras.
-				
-				//AS transportadores q recebem negativo, devem cancelar esses jobs..
+				//GETS BUDGET
+				transport.setPrice(newJob.getJobPrice());
+				transport.setId(newJob.getCompanyName()); 
+				transport.setState(TransportStateView.BUDGETED);
 			}
+			
+			//Find cheapest Transporter
+			int chosenPrice = 100;
+			TransportView chosenOne = new TransportView();
+			for(TransportView transport: tempTransports){
+				if(transport.getPrice() < chosenPrice){
+					chosenPrice = transport.getPrice();
+					chosenOne = transport;
+				}
+			}
+			
+			//Contact Transporters, accepting or denying
+			for(TransporterClient transporter : transporterClients){
+				JobView receivingJob;
+				boolean chosen = false;
+				String chosenOneID = chosenOne.getId();
+				TransportView transportView = getTransportViewByCompany(transporter.getWsName(), tempTransports);
+				
+				if(transporter.getWsName() == chosenOneID){
+					receivingJob = transporter.decideJob(chosenOneID, true);
+					chosen = true;
+				}
+				
+				else{
+					receivingJob = transporter.decideJob(transportView.getId(), false);
+				}
+				
+				if(receivingJob != null){
+					transportView.setState(chosen ? TransportStateView.BOOKED : TransportStateView.FAILED);
+				}
+				else
+					throw new UnavailableTransportFault_Exception("ERROR: Transporter Service doesn't know ID when accepting or rejecting job", new UnavailableTransportFault());
+			}
+			
+			
+			
 			
 		}catch(BadLocationFault_Exception e){
 			throw new UnknownLocationFault_Exception("ERROR: Unknown locations given.", new UnknownLocationFault());
 		}catch(BadPriceFault_Exception e){
 			throw new InvalidPriceFault_Exception("ERROR: Price give can't be lower than zero.", new InvalidPriceFault());
+		}catch(BadJobFault_Exception e){
+			throw new UnavailableTransportFault_Exception("ERROR: Transporter Service doesn't know a given transport ID", new UnavailableTransportFault());
 		}
 		
 		
@@ -109,5 +156,43 @@ public class BrokerPort implements BrokerPortType{
 	public void clearTransports() {
 		transports.clear();
 	}
-
+	
+	/**
+	 * Created a new transport instance, with incrementing id.
+	 * 
+	 * @param origin 
+	 * @param destination
+	 * @param price
+	 * @return transport TransportView created
+	 */
+	public TransportView getTransportView(String origin, String destination, int price, String transporterName, String id){
+		TransportView transport = new TransportView();
+		transport.setTransporterCompany(transporterName);
+		transport.setDestination(destination);
+		transport.setId(id);
+		transport.setOrigin(origin);
+		transport.setPrice(price);
+		transport.setState(TransportStateView.REQUESTED);
+		return transport;
+	}
+	
+	/**
+	 * Returns a TransportView for a specific transporter
+	 * 
+	 * @param transporter The specific transporter name 
+	 * @param 
+	 * @return transport TransportView created
+	 */
+	public TransportView getTransportViewByCompany(String transporterName, ArrayList<TransportView> tempTransports) throws UnavailableTransportFault_Exception{
+		
+		for(TransportView tempTransport : tempTransports){
+			if(transporterName == tempTransport.getTransporterCompany()){
+				return tempTransport;
+			}
+		}
+		
+		throw new UnavailableTransportFault_Exception("ERROR: Couldn't find a transport ID for given TransportView List", new UnavailableTransportFault());
+	}
+	
+	
 }	
