@@ -9,7 +9,7 @@ import javax.jws.WebService;
 import pt.upa.transporter.TransporterEndpointManager;
 
 @WebService(
-	    endpointInterface="pt.upa.transporter.ws.TransporterPortType",
+	    endpointInterface="pt.upa.transporter.ws.TransporterPortType", //Java interface with invocable methods declaration
 	    wsdlLocation="transporter.1_0.wsdl",
 	    name="TransporterWebService",
 	    portName="TransporterPort",
@@ -21,7 +21,7 @@ public class TransporterPort implements TransporterPortType{
 	private final String name;
 	private final boolean pair; //true if pair, false otherwise
 	private final String[] north = {"Porto","Braga","Viana do Castelo","Vila Real","Bragança"};
-	private final String[] center = {"Lisboa","Leiria","Santarem","Castelo Branco","Coimbr","Aveir","Vise","Guarda"};
+	private final String[] center = {"Lisboa","Leiria","Santarem","Castelo Branco","Coimbra","Aveiro","Viseu","Guarda"};
 	private final String[] south = {"Setubal", "Évora", "Portalegre", "Beja", "Faro"};
 	
 	private static long id = 0;
@@ -82,7 +82,7 @@ public class TransporterPort implements TransporterPortType{
 			offerPrice = ThreadLocalRandom.current().nextInt(1, price);
 		}
 		
-		//Create job with Proposed status
+		//Create job with PROPOSED state
 		JobView job = getJobView(origin, destination, offerPrice);
 		jobs.add(job);
 		

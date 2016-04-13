@@ -34,6 +34,7 @@ public class BrokerEndpointManager {
 
 	/** Web Service endpoint */
 	private Endpoint endpoint = null;
+
 	/** UDDI Naming instance for contacting UDDI server */
 	private UDDINaming uddiNaming = null;
 
