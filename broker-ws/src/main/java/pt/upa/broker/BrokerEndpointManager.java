@@ -28,7 +28,7 @@ public class BrokerEndpointManager {
 	private BrokerPort portImpl;
 
 	/** Obtain Port implementation */
-	public BrokerPortType getPort() {
+	public BrokerPort getPort() {
 		return portImpl;
 	}
 
@@ -61,6 +61,7 @@ public class BrokerEndpointManager {
 		this.wsName = wsName;
 		this.wsURL = wsURL;
 		portImpl = new BrokerPort(wsName, this);
+		
 		
 	}
 

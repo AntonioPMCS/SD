@@ -1,7 +1,21 @@
 package pt.upa.broker.ws.cli;
 
+import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.upa.broker.ws.BrokerPortType;
+import pt.upa.broker.ws.BrokerService;
+import pt.upa.broker.ws.InvalidPriceFault_Exception;
+import pt.upa.broker.ws.TransportView;
+import pt.upa.broker.ws.UnavailableTransportFault_Exception;
+import pt.upa.broker.ws.UnavailableTransportPriceFault_Exception;
+import pt.upa.broker.ws.UnknownLocationFault_Exception;
+import pt.upa.broker.ws.UnknownTransportFault_Exception;
+
 import static javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.ws.BindingProvider;
 
 public class BrokerClient implements BrokerPortType{
 
@@ -12,7 +26,7 @@ public class BrokerClient implements BrokerPortType{
 	}
 
 	/** constructor with provided UDDI location and name */
-	public BrokerClient(String uddiURL, String wsName) throws TransporterClientException {
+	public BrokerClient(String uddiURL, String wsName) throws BrokerClientException {
 		this.uddiURL = uddiURL;
 		this.wsName = wsName;
 		uddiLookup();
@@ -20,7 +34,7 @@ public class BrokerClient implements BrokerPortType{
 	}
 
 	/** UDDI lookup */
-	private void uddiLookup() throws TransporterClientException {
+	private void uddiLookup() throws BrokerClientException {
 		try {
 			if (verbose)
 				System.out.printf("Contacting UDDI at %s%n", uddiURL);
@@ -32,12 +46,12 @@ public class BrokerClient implements BrokerPortType{
 
 		} catch (Exception e) {
 			String msg = String.format("Client failed lookup on UDDI at %s!", uddiURL);
-			throw new TransporterClientException(msg, e);
+			throw new BrokerClientException(msg, e);
 		}
 
 		if (wsURL == null) {
 			String msg = String.format("Service with name %s not found on UDDI at %s", wsName, uddiURL);
-			throw new TransporterClientException(msg);
+			throw new BrokerClientException(msg);
 		}
 	}
 
@@ -58,10 +72,10 @@ public class BrokerClient implements BrokerPortType{
 	}
 
 	/** WS service */
-	TransporterService service = null;
+	BrokerService service = null;
 
 	/** WS port (port type is the interface, port is the implementation) */
-	TransporterPortType port = null;
+	BrokerPortType port = null;
 
 	/** UDDI server URL */
 	private String uddiURL = null;
@@ -94,7 +108,7 @@ public class BrokerClient implements BrokerPortType{
 	}
 
 	public void clearTransports() {
-		return port.clearTransports();
+		port.clearTransports();
 	}
 
 

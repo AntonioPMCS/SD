@@ -30,7 +30,9 @@ public class BrokerApplication {
 
 		try {
 			endpoint.start();
+			endpoint.getPort().lookUpTransporterServices(); 
 			endpoint.awaitConnections();
+			
 		} finally {
 			endpoint.stop();
 		}

@@ -30,37 +30,21 @@ public class BrokerPort implements BrokerPortType{
 	private String name;
 	private List<TransportView> transports = new ArrayList<TransportView>();
 	private BrokerEndpointManager endpointManager;
-	private Collection endpoints;
+	private ArrayList<String> endpoints = new ArrayList<String>();
 	private ArrayList<TransporterClient> transporterClients = new ArrayList<TransporterClient>();
 	
 	public BrokerPort(String name, BrokerEndpointManager endpointManager) throws JAXRException{
 		this.name=name;
 		this.endpointManager = endpointManager;
-		endpoints = this.endpointManager.getUddiNaming().list("UpaTransporter%");
 		
-		Iterator itr = endpoints.iterator();
-		
-		//TODO: ask where this should be, in endpoint manager, here?
-	    while (itr.hasNext()) {
-	    	
-	        String transporterEndpoint = (String) itr.next();
-	        TransporterClient tc;
-			try {
-				tc = new TransporterClient(transporterEndpoint);
-				transporterClients.add(tc);
-			} catch (TransporterClientException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	        
-	    }
 	}
 	
 	public String ping (String name) {
-		/*for(TransporterClient transporter : transporterClients){
-			transporter.ping(name);
-		}*/
-		return name;
+		for(TransporterClient transporter : transporterClients){
+			return transporter.ping(name);
+
+		}
+		return "Unavailable to ping";
 	}
 
 	public String requestTransport (String origin, String destination, int price)
@@ -194,5 +178,22 @@ public class BrokerPort implements BrokerPortType{
 		throw new UnavailableTransportFault_Exception("ERROR: Couldn't find a transport ID for given TransportView List", new UnavailableTransportFault());
 	}
 	
+	public void lookUpTransporterServices() throws JAXRException{
+		//endpoints.clear();
+		//System.out.println(endpointManager.getUddiNaming().list("UpaTransporter%"));
+		
+		for(String endpoint : endpointManager.getUddiNaming().list("UpaTransporter%")){
+			endpoints.add(endpoint);
+		
+			TransporterClient tc;
+			try {
+				tc = new TransporterClient(endpoint);
+				transporterClients.add(tc);
+			} catch (TransporterClientException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
 	
 }	
