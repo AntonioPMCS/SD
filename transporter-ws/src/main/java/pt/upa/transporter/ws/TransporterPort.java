@@ -2,8 +2,12 @@ package pt.upa.transporter.ws;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
+
 import javax.jws.WebService;
 
 import pt.upa.transporter.TransporterEndpointManager;
@@ -18,6 +22,9 @@ import pt.upa.transporter.TransporterEndpointManager;
 	)
 
 public class TransporterPort implements TransporterPortType{
+	private static final int ONE_SECOND = 1000;
+	private static final int FIVE_SECONDS = 5000;
+	private static final int CHANGE_TO_HEADING = 1;
 	private final String name;
 	private final boolean pair; //true if pair, false otherwise
 	private final String[] north = {"Porto","Braga","Viana do Castelo","Vila Real","Bragança"};
@@ -98,6 +105,9 @@ public class TransporterPort implements TransporterPortType{
 				jobFound = true;
 				if(accept){
 					job.setJobState(JobStateView.ACCEPTED);
+					int delay = ThreadLocalRandom.current().nextInt(ONE_SECOND, FIVE_SECONDS + 1);
+					Timer timer = new Timer();
+					timer.schedule(new TransportTimer(id, CHANGE_TO_HEADING, this), delay);
 				}
 				else{
 					job.setJobState(JobStateView.REJECTED);
@@ -210,5 +220,4 @@ public class TransporterPort implements TransporterPortType{
 		job.setJobState(JobStateView.PROPOSED);
 		return job;
 	}
-	
 }

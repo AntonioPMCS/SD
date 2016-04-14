@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimerTask;
 
 @WebService(
     endpointInterface="pt.upa.broker.ws.BrokerPortType",
@@ -178,6 +179,9 @@ public class BrokerPort implements BrokerPortType{
 		throw new UnavailableTransportFault_Exception("ERROR: Couldn't find a transport ID for given TransportView List", new UnavailableTransportFault());
 	}
 	
+	/**
+	 * Makes a search for TransporterServices available
+	 */
 	public void lookUpTransporterServices() throws JAXRException{
 		//endpoints.clear();
 		//System.out.println(endpointManager.getUddiNaming().list("UpaTransporter%"));
@@ -195,5 +199,6 @@ public class BrokerPort implements BrokerPortType{
 			}
 		}
 	}
+	
 	
 }	
