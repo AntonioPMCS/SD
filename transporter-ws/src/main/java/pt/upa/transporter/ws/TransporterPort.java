@@ -30,7 +30,7 @@ public class TransporterPort implements TransporterPortType{
 	private final String[] north = {"Porto","Braga","Viana do Castelo","Vila Real","Bragança"};
 	private final String[] center = {"Lisboa","Leiria","Santarem","Castelo Branco","Coimbra","Aveiro","Viseu","Guarda"};
 	private final String[] south = {"Setubal", "Évora", "Portalegre", "Beja", "Faro"};
-	private Timer timer;
+	private Timer timer = new Timer();
 	private static int id = 0;
 	private ArrayList<JobView> jobs = new ArrayList<JobView>();
 	
