@@ -222,11 +222,11 @@ public class BrokerPort implements BrokerPortType{
 	}
 	
 	/**
-	 * Given a job, returns the corresponding TransportView belonging to a list
+	 * Given a job, returns the corresponding TransportView belonging to TransportViewList
 	 * 
-	 * @param job
-	 * @param requests
-	 * @return TransportView
+	 * @param job The JobView given
+	 * @param requests The TransportView list in which to search
+	 * @return TransportView THe transportView found
 	 */
 	public TransportView chosenTransportView(JobView job, ArrayList<TransportView> requests){
 		for(TransportView request: requests){

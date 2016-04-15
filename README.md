@@ -38,17 +38,16 @@ cd juddi/bin
 [2] Criar pasta temporária
 
 ```
-cd ...
-mkdir ...
+cd ~/
+mkdir project
 ```
 
 
 [3] Obter código fonte do projeto (versão entregue)
 
 ```
-git clone ... 
+git clone https://github.com/tecnico-distsys/A_49-project.git
 ```
-*(colocar aqui comandos git para obter a versão entregue a partir da tag e depois apagar esta linha)*
 
 
 [4] Instalar módulos de bibliotecas auxiliares
@@ -71,16 +70,21 @@ mvn clean install
 [1] Construir e executar **servidor**
 
 ```
-cd ...-ws
+cd transporter-ws
 mvn clean install
-mvn exec:java
+mvn exec:java -Dws.i=x //'x' refere-se à instância que se deseja lançar
+		       //ex: mxn exec:java -Dws.i=1
+		       //default -> x=1
+mvn test               //para correr testes unitários
 ```
 
 [2] Construir **cliente** e executar testes
 
 ```
-cd ...-ws-cli
+cd transporter-ws-cli
 mvn clean install
+mvn exec:java       //para correr situação exempo
+mvn verify          //para correr testes integração e de mock
 ```
 
 ...
@@ -93,17 +97,19 @@ mvn clean install
 [1] Construir e executar **servidor**
 
 ```
-cd ...-ws
+cd broker-ws
 mvn clean install
 mvn exec:java
+mvn test	//para correr testes unitários simples
 ```
 
 
 [2] Construir **cliente** e executar testes
 
 ```
-cd ...-ws-cli
+cd broker-ws-cli
 mvn clean install
+mvn exec:java	//seguir instruções na command interface
 ```
 
 ...
