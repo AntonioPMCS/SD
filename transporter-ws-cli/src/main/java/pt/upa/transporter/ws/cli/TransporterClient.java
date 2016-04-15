@@ -61,6 +61,7 @@ public class TransporterClient implements TransporterPortType{
 		
 		this.wsURL = wsURL;
 		createStub();
+		
 	}
 
 	/** constructor with provided UDDI location and name */
@@ -115,6 +116,8 @@ public class TransporterClient implements TransporterPortType{
 	
 	@Override
 	public String ping(String name) {
+		this.wsName = port.ping(name).split(" ")[0];
+		
 		return port.ping(name);
 	}
 

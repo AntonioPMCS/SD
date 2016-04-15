@@ -7,6 +7,7 @@ import pt.upa.broker.BrokerEndpointManager;
 import pt.upa.transporter.ws.BadJobFault_Exception;
 import pt.upa.transporter.ws.BadLocationFault_Exception;
 import pt.upa.transporter.ws.BadPriceFault_Exception;
+import pt.upa.transporter.ws.JobStateView;
 import pt.upa.transporter.ws.JobView;
 import pt.upa.transporter.ws.cli.TransporterClient;
 import pt.upa.transporter.ws.cli.TransporterClientException;
@@ -37,35 +38,37 @@ public class BrokerPort implements BrokerPortType{
 	public BrokerPort(String name, BrokerEndpointManager endpointManager) throws JAXRException{
 		this.name=name;
 		this.endpointManager = endpointManager;
-		
 	}
 	
-	public String ping (String name) {
+	public String ping (String word) {
+		String comeBack = name + "received from the transporters: " + '\n';
 		for(TransporterClient transporter : transporterClients){
-			return transporter.ping(name);
-
+			comeBack+= transporter.ping(word) + '\n';
 		}
-		return "Unavailable to ping";
+		return comeBack;
 	}
 
 	public String requestTransport (String origin, String destination, int price)
 		throws InvalidPriceFault_Exception, UnavailableTransportFault_Exception, UnavailableTransportPriceFault_Exception, UnknownLocationFault_Exception {
 	
-		
-		TransportView transport = new TransportView();
+		TransportView chosenRequest = null;
 		try{
-			lookUpTransporterServices();
 			
-			//CREATE TRANSPORT REQUEST
-			transport = getTransportView(origin, destination, price, null, null);
+			//CREATE TRANSPORT REQUESTS
+			ArrayList<TransportView> requests = new ArrayList<TransportView>();
 			
 			ArrayList<JobView> tempJobs = new ArrayList<JobView>();
+			ArrayList<TransporterClient> validTransporters = new ArrayList<TransporterClient>();
 			
 			//SEND REQUEST TO ALL TRANSPORTERS
 			for(TransporterClient transporter : transporterClients){
 				JobView newJob = transporter.requestJob(origin, destination, price);
-				if(newJob != null)
+				if(newJob != null){
 					tempJobs.add(newJob);
+					validTransporters.add(transporter);
+					TransportView request = getTransportView(origin, destination, price, newJob.getCompanyName(), newJob.getJobIdentifier());
+					requests.add(request);
+				}
 			}
 			
 			//IF only null responses
@@ -75,6 +78,8 @@ public class BrokerPort implements BrokerPortType{
 				else 
 					throw new UnavailableTransportFault_Exception("ERROR: Transporters don't operate on request areas.", new UnavailableTransportFault());
 			}
+			
+			
 			
 			//Find cheapeast offer
 			int maxPrice = price;
@@ -86,57 +91,66 @@ public class BrokerPort implements BrokerPortType{
 				}
 			}
 			
-			//Defines trip
-			transport.setId(chosenTransporter.getJobIdentifier());
-			transport.setState(TransportStateView.BUDGETED);
+			//Defines budgeted
+			for(TransportView temp : transports){
+				temp.setState(TransportStateView.BUDGETED);
+			}
+			
 			
 			if(maxPrice == price){
-				for(TransporterClient transporter : transporterClients){
-					transporter.decideJob(transport.getId(), false);
-					
+				for(TransportView request : requests){
+					request.setState(TransportStateView.FAILED);
 				}
-				transport.setState(TransportStateView.FAILED);
 				throw new UnavailableTransportPriceFault_Exception("ERROR: No offers lower than requested", new UnavailableTransportPriceFault());
 			}
 			else{
-				transport.setPrice(chosenTransporter.getJobPrice());
+				chosenRequest = chosenTransportView(chosenTransporter, requests);
+				chosenRequest.setState(TransportStateView.BOOKED);
+				transports.add(chosenRequest);
 				
 				//Contact Transporters, accepting or denying
-				for(TransporterClient transporter : transporterClients){
+				for(TransporterClient transporter : validTransporters){
 					JobView receivingJob;
 					
 					//Gets Job returned from decideJob()
-					if(transporter.getWsName() == transport.getId())
-						receivingJob = transporter.decideJob(transport.getId(), true);
-		
-					else
-						receivingJob = transporter.decideJob(transport.getId(), false);
-					
+					if(transporter.getWsName().equals(chosenRequest.getTransporterCompany()))
+						receivingJob = transporter.decideJob(chosenRequest.getId(), true);
+					else{
+						TransportView request = getTransportViewByCompany(transporter.getWsName(), requests);
+						receivingJob = transporter.decideJob(request.getId(), false);
+						request.setState(TransportStateView.FAILED);
+					}
 					//Checks nullity
 					if(receivingJob == null)
 						throw new UnavailableTransportFault_Exception("ERROR: Transporter Service doesn't know ID when accepting or rejecting job", new UnavailableTransportFault());
-					
-					transport.setState(TransportStateView.BOOKED);
 				}
 			}
 			
 		}catch(BadLocationFault_Exception e){
-			throw new UnknownLocationFault_Exception("ERROR: Unknown locations given.", new UnknownLocationFault());
+			throw new UnknownLocationFault_Exception("ERROR: Unknown locations given: "+e.getMessage(), new UnknownLocationFault());
 		}catch(BadPriceFault_Exception e){
 			throw new InvalidPriceFault_Exception("ERROR: Price give can't be lower than zero.", new InvalidPriceFault());
 		}catch(BadJobFault_Exception e){
-			throw new UnavailableTransportFault_Exception("ERROR: Transporter Service doesn't know a given transport ID", new UnavailableTransportFault());
-		} catch (JAXRException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			throw new UnavailableTransportFault_Exception("ERROR: Transporter Service doesn't know a given transport ID "+e.getMessage(), new UnavailableTransportFault());
+		} 
 	
-		return "#-> Transport service successfully requested. Your transport has the following id: "+transport.getId();
+		return "#-> Transport service successfully requested. Your transport has the following id: "+chosenRequest.getId();
 	}
 
 	public TransportView viewTransport (String id) throws UnknownTransportFault_Exception {
 		for(TransportView transport : transports){
-			if(transport.getId() == id){
+			if(transport.getId().equals(id)){
+				for(TransporterClient temp : transporterClients){
+					if(transport.getTransporterCompany().equals(temp.getWsName())){
+						JobView job = temp.jobStatus(id);
+						if(job.getJobState() == JobStateView.HEADING)
+							transport.setState(TransportStateView.HEADING);
+						else if(job.getJobState() == JobStateView.ONGOING)
+							transport.setState(TransportStateView.ONGOING);
+						else if(job.getJobState() == JobStateView.COMPLETED)
+							transport.setState(TransportStateView.COMPLETED);
+					}
+				}
 				return transport;
 			}
 		}
@@ -178,9 +192,8 @@ public class BrokerPort implements BrokerPortType{
 	 * @return transport TransportView created
 	 */
 	public TransportView getTransportViewByCompany(String transporterName, ArrayList<TransportView> tempTransports) throws UnavailableTransportFault_Exception{
-		
 		for(TransportView tempTransport : tempTransports){
-			if(transporterName == tempTransport.getTransporterCompany()){
+			if(transporterName.equals(tempTransport.getTransporterCompany())){
 				return tempTransport;
 			}
 		}
@@ -200,6 +213,7 @@ public class BrokerPort implements BrokerPortType{
 			try {
 				tc = new TransporterClient(endpoint);
 				transporterClients.add(tc);
+				tc.ping(" ");
 			} catch (TransporterClientException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -207,5 +221,19 @@ public class BrokerPort implements BrokerPortType{
 		}
 	}
 	
+	/**
+	 * Given a job, returns the corresponding TransportView belonging to a list
+	 * 
+	 * @param job
+	 * @param requests
+	 * @return TransportView
+	 */
+	public TransportView chosenTransportView(JobView job, ArrayList<TransportView> requests){
+		for(TransportView request: requests){
+			if(request.getId().equals(job.getJobIdentifier()))
+					return request;
+		}
+		return null;
+	}
 	
 }	

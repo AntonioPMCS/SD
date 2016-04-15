@@ -69,6 +69,7 @@ public class BrokerEndpointManager {
 	public BrokerEndpointManager(String wsURL) {
 		if (wsURL == null)
 			throw new NullPointerException("Web Service URL cannot be null!");
+		
 		this.wsURL = wsURL;
 	}
 
