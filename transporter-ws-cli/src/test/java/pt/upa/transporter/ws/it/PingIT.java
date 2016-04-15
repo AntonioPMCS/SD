@@ -4,21 +4,22 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import com.sun.xml.ws.fault.ServerSOAPFaultException;
+
 public class PingIT extends BaseTransporterIT {
 
 	@Test
 	public void testPingString(){
-		assertEquals(client.ping(TEST_STRING), "TransporterServer responding to ping request...Message given: "+TEST_STRING);
+		assertEquals(evenClient.ping(TEST_STRING), evenClient.getWsName()+" responding to ping request...Message given: "+TEST_STRING);
 	}
 	
-	//TODO: pôr expected de excepção
 	@Test
 	public void testPingNull() throws Exception{
-		client.ping(null);
+		assertEquals(evenClient.ping(null), evenClient.getWsName()+" responding to ping request...Message given: "+null);
 	}
 	
 	@Test
 	public void testPingEmptyString(){
-		assertEquals(client.ping(EMPTY_STRING), "TransporterServer responding to ping request...Message given: ");
+		assertEquals(evenClient.ping(EMPTY_STRING), evenClient.getWsName()+" responding to ping request...Message given: ");
 	}
 }

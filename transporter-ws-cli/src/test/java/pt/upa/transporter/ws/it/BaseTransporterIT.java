@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 
 import pt.upa.transporter.ws.cli.TransporterClient;
@@ -18,7 +19,8 @@ public class BaseTransporterIT {
 	private static final String TEST_PROP_FILE = "/test.properties";
 	private static Properties props = null;
 	
-	protected static TransporterClient client = null;
+	protected static TransporterClient oddClient = null;
+	protected static TransporterClient evenClient = null;
 	protected static final String VALID_LOCATION = "Lisboa";
 	protected static final String NORTH_LOCATION = "Porto";
 	protected static final String SOUTH_LOCATION = "Faro";
@@ -30,39 +32,28 @@ public class BaseTransporterIT {
 	protected static final int INDEX_ZERO = 0;
 	protected static final String EMPTY_STRING = "";
 	protected static final String TEST_STRING = "test";
+	protected final static int LOWER_THAN_TEN_PRICE = 9;
+	protected final static int EVEN_PRICE = 20;
+	protected final static int ODD_PRICE = 21;
 	
 	@BeforeClass
 	public static void oneTimeSetup() throws Exception {
-		props = new Properties();
-		try {
-			props.load(BaseTransporterIT.class.getResourceAsStream(TEST_PROP_FILE));
-		} catch (IOException e) {
-			final String msg = String.format("Could not load properties file {}", TEST_PROP_FILE);
-			System.out.println(msg);
-			throw e;
-		}
-		String uddiEnabled = props.getProperty("uddi.enabled");
 		
-		String uddiURL2 = props.getProperty("uddiPair.url");
-		String wsName2 = props.getProperty("wsPair.name");
-		String wsURL2 = props.getProperty("wsPair.url");
+		evenClient = new TransporterClient("http://localhost:9090","UpaTransporter2");
+		evenClient.setVerbose(true);
 		
-		String uddiURL1 = props.getProperty("uddiNotPair.url");
-		String wsName1 = props.getProperty("wsNotPair.name");
-		String wsURL1 = props.getProperty("wsNotPair.url");
-		
-
-		if ("true".equalsIgnoreCase(uddiEnabled)) {
-			client = new TransporterClient(uddiURL1, wsName1);
-		} else {
-			client = new TransporterClient(wsURL1);
-		}
-		client.setVerbose(true);
-
+		oddClient = new TransporterClient("http://localhost:9090","UpaTransporter1");
+		oddClient.setVerbose(true);
 	}
 
 	@AfterClass
 	public static void cleanup() {
-		client = null;
+		evenClient = null;
 	}
+	
+	@Before
+    public void setUp() {
+    	evenClient.clearJobs();
+    	oddClient.clearJobs();
+    }
 }

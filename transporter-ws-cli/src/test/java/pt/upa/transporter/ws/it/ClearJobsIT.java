@@ -8,8 +8,8 @@ public class ClearJobsIT extends BaseTransporterIT{
 
 	@Test
 	public void testJobDeletion() throws Exception{
-		client.requestJob(VALID_LOCATION, VALID_LOCATION, VALID_PRICE);
-		client.clearJobs();
-		assertEquals(client.listJobs() == null, true);
+		evenClient.requestJob(VALID_LOCATION, VALID_LOCATION, VALID_PRICE);
+		evenClient.clearJobs();
+		assertEquals(true, evenClient.listJobs().size() == 0);
 	}
 }

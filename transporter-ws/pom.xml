@@ -27,7 +27,7 @@
         <ws.i>2</ws.i>
 
         <ws.host>localhost</ws.host>
-        <ws.port>808${ws.i}</ws.port>
+        <ws.port>809${ws.i}</ws.port>
         <ws.url>http://${ws.host}:${ws.port}/transporter-ws/endpoint</ws.url>
 
         <ws.name>UpaTransporter${ws.i}</ws.name>

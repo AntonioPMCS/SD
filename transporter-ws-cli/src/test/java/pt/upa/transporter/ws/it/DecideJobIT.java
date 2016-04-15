@@ -6,31 +6,31 @@ import org.junit.Test;
 
 import pt.upa.transporter.ws.BadJobFault_Exception;
 import pt.upa.transporter.ws.JobStateView;
+import pt.upa.transporter.ws.JobView;
 
 public class DecideJobIT extends BaseTransporterIT{
 
 	@Test(expected = BadJobFault_Exception.class)
 	public void testDecideJobUnknownID() throws Exception{
-		client.decideJob(UNKNOWN_JOB_ID, true);
+		evenClient.decideJob(UNKNOWN_JOB_ID, true);
 	}
 	
-	//TODO: nao é esta a excepção q deve lançar...
 	@Test(expected = BadJobFault_Exception.class)
 	public void testDecideJobNullID() throws Exception{
-		client.decideJob(null, true);
+		evenClient.decideJob(null, true);
 	}
 	
 	@Test
 	public void testAcceptJob() throws Exception{
-		client.requestJob(VALID_LOCATION, VALID_LOCATION, VALID_PRICE);
-		client.decideJob(client.getWsName()+"1", true);
-		assertEquals(client.listJobs().get(INDEX_ZERO).getJobState(), JobStateView.ACCEPTED);
+		JobView job = evenClient.requestJob(VALID_LOCATION, VALID_LOCATION, VALID_PRICE);
+		evenClient.decideJob(job.getJobIdentifier(), true);
+		assertEquals(JobStateView.ACCEPTED, evenClient.jobStatus(job.getJobIdentifier()).getJobState());
 	}
 	
 	@Test
 	public void testRejectJob() throws Exception{
-		client.requestJob(VALID_LOCATION, VALID_LOCATION, VALID_PRICE);
-		client.decideJob(client.getWsName()+"1", false);
-		assertEquals(client.listJobs().get(INDEX_ZERO).getJobState(), JobStateView.REJECTED);
+		JobView job = evenClient.requestJob(VALID_LOCATION, VALID_LOCATION, VALID_PRICE);
+		evenClient.decideJob(job.getJobIdentifier(), false);
+		assertEquals(JobStateView.REJECTED, evenClient.jobStatus(job.getJobIdentifier()).getJobState());
 	}
 }

@@ -58,6 +58,7 @@ public class TransporterClient implements TransporterPortType{
 
 	/** constructor with provided web service URL */
 	public TransporterClient(String wsURL) throws TransporterClientException {
+		
 		this.wsURL = wsURL;
 		createStub();
 	}
@@ -108,7 +109,6 @@ public class TransporterClient implements TransporterPortType{
 		}
 	}
 	
-	//TODO: CAN'T BE PUBLIC!!!right?
 	public String getWsName(){
 		return wsName;
 	}

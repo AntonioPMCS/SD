@@ -33,6 +33,7 @@ public class TransporterClientServicePortMockTest {
 
 	/** mocked web service endpoint address */
 	private static String wsURL = "http://host:port/endpoint";
+	private final static String PING_RESPONSE = " responding to ping request...Message given: ";
 
 	
     // one-time initialization and clean-up
@@ -64,10 +65,6 @@ public class TransporterClientServicePortMockTest {
     	contextMap = null;
     }
 
-
-    // tests
-    // assertEquals(expected, actual);
-
     /**
      *  In this test the server is mocked to
      *  simulate a communication exception.
@@ -85,15 +82,17 @@ public class TransporterClientServicePortMockTest {
             new TransporterService();
             service.getTransporterPort(); result = port;
             port.getRequestContext(); result = contextMap;
-           // port.sum(anyInt, anyInt); TODO
+           
+            port.ping(anyString);
             result = new WebServiceException("fabricated");
         }};
 
 
         // Unit under test is exercised.
         TransporterClient client = new TransporterClient(wsURL);
+        
         // call to mocked server
-        //client.sum(1,2);	TODO
+        client.ping("Mocking again...");
     }
 
     /**
@@ -112,9 +111,9 @@ public class TransporterClientServicePortMockTest {
             new TransporterService();
             service.getTransporterPort(); result = port;
             port.getRequestContext(); result = contextMap;
-            //port.sum(1, 2);	TODO
+            port.ping("test");
             // first call to sum returns the result
-            result = 3;
+            result = PING_RESPONSE;
             // second call throws an exception
             result = new WebServiceException("fabricated");
         }};
@@ -125,7 +124,7 @@ public class TransporterClientServicePortMockTest {
 
         // first call to mocked server
         try {
-           // client.sum(1,2);		TODO
+           port.ping("test");
         } catch(WebServiceException e) {
             // exception is not expected
             fail();
@@ -133,7 +132,7 @@ public class TransporterClientServicePortMockTest {
 
         // second call to mocked server
         try {
-            //client.sum(1,2); TODO
+            port.ping("test");
             fail();
         } catch(WebServiceException e) {
             // exception is expected
@@ -150,18 +149,19 @@ public class TransporterClientServicePortMockTest {
         @Mocked final TransporterService service,
         @Mocked final P port)
         throws Exception {
-
+    	/*
         // an "expectation block"
         // One or more invocations to mocked types, causing expectations to be recorded.
         new Expectations() {{
             new TransporterService();
             service.getTransporterPort(); result = port;
             port.getRequestContext(); result = contextMap;
-            //port.intdiv(anyInt, anyInt); TODO
+            
+            port.requestJob(anyString, anyString, 101);
             // first call to intdiv returns any number
-            result = anyInt;
+            result = null;
             // second call throws an exception
-           // result = new DivideByZero("fabricated", new DivideByZeroType()); TODO
+            result = new DivideByZero("fabricated", new DivideByZeroType()); TODO
         }};
 
 
@@ -175,7 +175,7 @@ public class TransporterClientServicePortMockTest {
         try {
             //client.intdiv(10,5);
             fail();
-        } catch(Exception e /*say which exception*/) {
+        } catch(Exception e  {
             // exception is expected
             assertEquals("fabricated", e.getMessage());
         }
@@ -187,6 +187,7 @@ public class TransporterClientServicePortMockTest {
             // Verifies that zero or one invocations occurred, with the specified argument value:
             //port.intdiv(anyInt, anyInt); maxTimes = 2; TODO
         }};
+        */
     }
     
     

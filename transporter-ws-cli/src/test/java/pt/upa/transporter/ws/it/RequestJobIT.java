@@ -9,81 +9,79 @@ import pt.upa.transporter.ws.BadPriceFault_Exception;
 
 public class RequestJobIT extends BaseTransporterIT{
 
-	//TODO: correct exception
-	@Test(expected = Exception.class)
+	@Test(expected = BadLocationFault_Exception.class)
 	public void testRequestJobNullOrigin() throws Exception{
-		
+		evenClient.requestJob(null, VALID_LOCATION, VALID_PRICE);
 	}
 	
-	//TODO: correct exception
-	@Test(expected = Exception.class)
+	@Test(expected = BadLocationFault_Exception.class)
 	public void testRequestJobNullDestination() throws Exception{
-		
-	}
-	
-	//TODO: correct exception
-	@Test(expected = Exception.class)
-	public void testRequestJobNullPrice() throws Exception{
-		
+		evenClient.requestJob(VALID_LOCATION, null, VALID_PRICE);
 	}
 	
 	@Test(expected = BadLocationFault_Exception.class)
 	public void testRequestJobUnknownOriginLocation() throws Exception{
-		client.requestJob(UNKNOWN_LOCATION, VALID_LOCATION, VALID_PRICE);
+		evenClient.requestJob(UNKNOWN_LOCATION, VALID_LOCATION, VALID_PRICE);
 	}
 	
 	@Test(expected = BadLocationFault_Exception.class)
 	public void testRequestJobUnknownDestinationLocation() throws Exception{
-		client.requestJob(VALID_LOCATION, UNKNOWN_LOCATION, VALID_PRICE);
+		evenClient.requestJob(VALID_LOCATION, UNKNOWN_LOCATION, VALID_PRICE);
 	}
 	
 	@Test(expected = BadPriceFault_Exception.class) 
 	public void testRequestJobNegativePrice() throws Exception{
-		client.requestJob(VALID_LOCATION, VALID_LOCATION, NEGATIVE_PRICE);
+		evenClient.requestJob(VALID_LOCATION, VALID_LOCATION, NEGATIVE_PRICE);
 	}
 	
 	@Test
 	public void testRequestJobHighPrice() throws Exception{
-		assertEquals(null, client.requestJob(VALID_LOCATION, VALID_LOCATION, HIGH_PRICE));
+		assertEquals(null, evenClient.requestJob(VALID_LOCATION, VALID_LOCATION, HIGH_PRICE));
 	}
 	
-	//TODO: CHECK SITUATION OF PAIR AND NOT PAIR
-	/*
+	@Test
+    public void testPriceLowerThan10() throws Exception{
+    	int offeredPrice = evenClient.requestJob(VALID_LOCATION, VALID_LOCATION, LOWER_THAN_TEN_PRICE).getJobPrice();
+    	assertTrue(offeredPrice < LOWER_THAN_TEN_PRICE);
+    }
+	
 	@Test
 	public void testRequestJobNotWorkingSouth() throws Exception{
-		assertEquals(null, client.requestJob(VALID_LOCATION, VALID_LOCATION, VALID_PRICE));
+		assertEquals(null, evenClient.requestJob(SOUTH_LOCATION, VALID_LOCATION, VALID_PRICE));
 	}
 	
 	@Test
 	public void testRequestJobNotWorkingNorth() throws Exception{
-		assertEquals(null, client.requestJob(VALID_LOCATION, VALID_LOCATION, VALID_PRICE));
+		assertEquals(null, oddClient.requestJob(NORTH_LOCATION, VALID_LOCATION, VALID_PRICE));
 	}
 	
 	@Test
-	public void testRequestJobPairNamePairPricePair() throws Exception{
-	
+	public void testRequestJobNameEvenPriceEven() throws Exception{
+		int offeredPrice = evenClient.requestJob(VALID_LOCATION, VALID_LOCATION, EVEN_PRICE).getJobPrice();
+    	assertTrue(offeredPrice < EVEN_PRICE);
 	}
 	
 	@Test
-	public void testRequestJobPairNamePairPriceNotPair() throws Exception(){
-	
+	public void testRequestJobNameEvenPriceOdd() throws Exception{
+		int offeredPrice = evenClient.requestJob(VALID_LOCATION, VALID_LOCATION, ODD_PRICE).getJobPrice();
+    	assertTrue(offeredPrice > ODD_PRICE);
 	}
 	
 	@Test
-	public void testRequestJobPairNameNotPairPricePair() throws Exception{
-	
+	public void testRequestJobNameOddPriceEven() throws Exception{
+		int offeredPrice = oddClient.requestJob(VALID_LOCATION, VALID_LOCATION, EVEN_PRICE).getJobPrice();
+    	assertTrue(offeredPrice > EVEN_PRICE);
 	}
 	
 	@Test
-	public void testRequestJobPairNameNotPairPriceNotPair() throws Exception(){
-	
+	public void testRequestJobNameOddPriceOdd() throws Exception{
+		int offeredPrice = oddClient.requestJob(VALID_LOCATION, VALID_LOCATION, ODD_PRICE).getJobPrice();
+    	assertTrue(offeredPrice < ODD_PRICE);
 	}
-	
-	*/
 	
 	@Test
 	public void testRequestCorrectJobCreation() throws Exception{
-		client.requestJob(VALID_LOCATION, VALID_LOCATION, VALID_PRICE);
-		assertEquals(1, client.listJobs().size());
+		evenClient.requestJob(VALID_LOCATION, VALID_LOCATION, VALID_PRICE);
+		assertEquals(1, evenClient.listJobs().size());
 	}
 }

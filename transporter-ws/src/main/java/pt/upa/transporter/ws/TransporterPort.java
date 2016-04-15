@@ -1,5 +1,6 @@
 package pt.upa.transporter.ws;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
@@ -10,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.jws.WebService;
 
-import pt.upa.transporter.TransporterEndpointManager;
 
 @WebService(
 	    endpointInterface="pt.upa.transporter.ws.TransporterPortType", //Java interface with invocable methods declaration
@@ -26,13 +26,13 @@ public class TransporterPort implements TransporterPortType{
 	private static final int FIVE_SECONDS = 5000;
 	private static final int CHANGE_TO_HEADING = 1;
 	private final String name;
-	private final boolean pair; //true if pair, false otherwise
+	private final boolean parity; //true if even, false otherwise
 	private final String[] north = {"Porto","Braga","Viana do Castelo","Vila Real","Bragança"};
 	private final String[] center = {"Lisboa","Leiria","Santarem","Castelo Branco","Coimbra","Aveiro","Viseu","Guarda"};
 	private final String[] south = {"Setubal", "Évora", "Portalegre", "Beja", "Faro"};
-	
-	private static long id = 0;
-	private Vector<JobView> jobs = new Vector<JobView>(); //Vector for concurrency?!
+	private Timer timer;
+	private static int id = 0;
+	private ArrayList<JobView> jobs = new ArrayList<JobView>();
 	
 	
 	
@@ -42,13 +42,13 @@ public class TransporterPort implements TransporterPortType{
 		int temp = Character.getNumericValue(name.charAt(14));
 		
 		//Sets parity
-		if(temp % 2 == 0){pair = true;}
-		else{pair = false;}
+		if(temp % 2 == 0){parity = true;}
+		else{parity = false;}
 	}
 
 	@Override
 	public String ping(String message) {
-		return "TransporterServer responding to ping request...Message given: "+message;
+		return name+" responding to ping request...Message given: "+message;
 	}
 
 	@Override
@@ -79,13 +79,13 @@ public class TransporterPort implements TransporterPortType{
 		int offerPrice;
 		
 		//In case everything is correct, define offer price
-		if(raiseOffer(price)){
-			//TODO: Check if intervals are right
+		if(price == 0 || price == 1)
+			offerPrice = 0;
+		else if(raiseOffer(price)){
 			offerPrice = ThreadLocalRandom.current().nextInt(price, 100 + 1);
 			
 		}
 		else{
-			//TODO: Check if intervals are right
 			offerPrice = ThreadLocalRandom.current().nextInt(1, price);
 		}
 		
@@ -94,19 +94,18 @@ public class TransporterPort implements TransporterPortType{
 		jobs.add(job);
 		
 		return job;
-		
 	}
 
 	@Override
 	public JobView decideJob(String id, boolean accept) throws BadJobFault_Exception {
 		boolean jobFound = false;
 		for(JobView job : jobs){
-			if(job.getJobIdentifier() == id){
+			if(job.getJobIdentifier().equals(id)){
 				jobFound = true;
 				if(accept){
 					job.setJobState(JobStateView.ACCEPTED);
 					int delay = ThreadLocalRandom.current().nextInt(ONE_SECOND, FIVE_SECONDS + 1);
-					Timer timer = new Timer();
+					timer = new Timer();
 					timer.schedule(new TransportTimer(id, CHANGE_TO_HEADING, this), delay);
 				}
 				else{
@@ -124,9 +123,8 @@ public class TransporterPort implements TransporterPortType{
 
 	@Override
 	public JobView jobStatus(String id) {
-		
 		for(JobView job : jobs){
-			if(job.getJobIdentifier() == id){
+			if(job.getJobIdentifier().equals(id)){
 				return job;
 			}
 		}
@@ -140,6 +138,9 @@ public class TransporterPort implements TransporterPortType{
 
 	@Override
 	public void clearJobs() {
+		timer.cancel();
+		timer.purge();
+		id = 0;
 		jobs.clear();
 	}
 	
@@ -165,10 +166,10 @@ public class TransporterPort implements TransporterPortType{
 	 */
 	public boolean workingZoneLocation(String location){
 		boolean knowsLocation = Arrays.asList(center).contains(location);
-		if(pair && !knowsLocation){
+		if(parity && !knowsLocation){
 			knowsLocation = Arrays.asList(north).contains(location);
 		}
-		else if(!pair && !knowsLocation){
+		else if(!parity && !knowsLocation){
 			knowsLocation = Arrays.asList(south).contains(location);
 		}
 		
@@ -184,17 +185,17 @@ public class TransporterPort implements TransporterPortType{
 	 */
 	public boolean raiseOffer(int price){
 		boolean raisePrice = false;
-		boolean priceIsPair = false;
+		boolean priceIsEven = false;
 		
-		//Check if price is pair
+		//Check if price is even
 		if(price % 2 == 0){
-			priceIsPair = true;
+			priceIsEven = true;
 		}
 		
 		//Decide upon the offer
-		//Price is raised when transporter is pair and price not pair
+		//Price is raised when transporter is Even and price not even
 		//of vice-versa -> XOR between them!
-		if(price > 10 && (pair ^ priceIsPair)){
+		if(price > 10 && (parity ^ priceIsEven)){
 			raisePrice = true;
 		}
 		
