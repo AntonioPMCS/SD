@@ -5,6 +5,9 @@
 
 *.class
 
+# Folders #
+/broker-ws/target/
+
 # Package Files #
 *.jar
 *.war

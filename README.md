@@ -1,15 +1,12 @@
 # Projeto de Sistemas Distribuídos 2015-2016 #
 
 Grupo de SD .49 - Campus Alameda
-*(preencher com número do grupo de SD no Fénix e depois apagar esta linha)*
 
 58803 Gonçalo Gaspar
 
 79715 António Silva
 
-70012 Filpe Cruzinha
-*(preencher com nome, número e email de membro do grupo e depois apagar esta linha)*
-
+70012 Filipe Cruzinha
 
 Repositório:
 [tecnico-distsys/C_49-project](https://github.com/tecnico-distsys/C_49-project/)
@@ -85,6 +82,10 @@ cd transporter-ws-cli
 mvn clean install
 mvn exec:java       //para correr situação exempo
 mvn verify          //para correr testes integração e de mock
+		    //ATENÇÃO: Lançar previamente dois Servidores Transporter-WS
+		    //com as seguintes flags:
+		    // -Dws.i=1
+                    // -Dws.i=2
 ```
 
 ...
@@ -110,6 +111,12 @@ mvn test	//para correr testes unitários simples
 cd broker-ws-cli
 mvn clean install
 mvn exec:java	//seguir instruções na command interface
+mvn verify      //para correr testes integração
+		//ATENÇÃO: Lançar previamente dois servidores transporter-WS
+	   	//com as seguintes flags:
+	   	// -Dws.i=1
+           	// -Dws.i=2
+		//Lançar também um servidor broker-ws
 ```
 
 ...
