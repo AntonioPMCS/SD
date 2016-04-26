@@ -6,7 +6,7 @@
 *.class
 
 # Folders #
-/broker-ws/target/
+./broker-ws/target/
 
 # Package Files #
 *.jar

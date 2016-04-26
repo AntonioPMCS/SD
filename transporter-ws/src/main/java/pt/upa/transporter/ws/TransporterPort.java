@@ -95,29 +95,38 @@ public class TransporterPort implements TransporterPortType{
 		
 		return job;
 	}
-
+	
+	
+	
+	/*TODO: só fazer isto se job com dado id estiver no estado PROPOSED
+	Should throw BadJobFault_Exception because it does not make sense
+	 *         to decide on an already decided job.*/
 	@Override
 	public JobView decideJob(String id, boolean accept) throws BadJobFault_Exception {
-		boolean jobFound = false;
-		for(JobView job : jobs){
-			if(job.getJobIdentifier().equals(id)){
-				jobFound = true;
-				if(accept){
-					job.setJobState(JobStateView.ACCEPTED);
-					int delay = ThreadLocalRandom.current().nextInt(ONE_SECOND, FIVE_SECONDS + 1);
-					timer = new Timer();
-					timer.schedule(new TransportTimer(id, CHANGE_TO_HEADING, this), delay);
+		if(jobStatus(id) != null){
+			
+			JobStateView current = jobStatus(id).getJobState();
+			if(current == JobStateView.ACCEPTED || current == JobStateView.REJECTED)
+				throw new BadJobFault_Exception("Job with id: #"+id+" already decided!", new BadJobFault());
+			
+			for(JobView job : jobs){
+				if(job.getJobIdentifier().equals(id)){
+					if(accept){
+						job.setJobState(JobStateView.ACCEPTED);
+						int delay = ThreadLocalRandom.current().nextInt(ONE_SECOND, FIVE_SECONDS + 1);
+						timer = new Timer();
+						timer.schedule(new TransportTimer(id, CHANGE_TO_HEADING, this), delay);
+					}
+					else{
+						job.setJobState(JobStateView.REJECTED);
+					}
+					return job;
 				}
-				else{
-					job.setJobState(JobStateView.REJECTED);
-				}
-				return job;
 			}
 		}
 		
-		if(!jobFound){
+		else
 			throw new BadJobFault_Exception("Job with id: #"+id+" doesn't exist!", new BadJobFault());
-		}
 		return null;
 	}
 

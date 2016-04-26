@@ -33,6 +33,8 @@ public class TransportTimer extends TimerTask{
 		}
 	}
 	
+	//TODO: ao executar testes de integração dos professores, lança null exception pointers
+	//ver essa situação.
 	/**
 	 * Changes Job Status to HEADING
 	 * 

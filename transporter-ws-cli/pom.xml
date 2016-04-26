@@ -22,7 +22,7 @@
         <wsdl.filename>transporter.1_0.wsdl</wsdl.filename>
 
 		<!-- instance number - redefine using -D option - e.g. mvn -Dws.i=2 exec:java -->
-		<ws.i>2</ws.i>
+		<ws.i>1</ws.i>
 		
         <mainclass>pt.upa.transporter.TransporterClientApplication</mainclass>
 
