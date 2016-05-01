@@ -6,8 +6,7 @@ import javax.jws.WebService;
 public class AuthorityImpl implements Authority{
 
 	public String ping(String msg) {
-		// TODO Auto-generated method stub
-		return null;
+		return "hello from Certificate Authority, your msg was: "+msg;
 	}
 
 }
