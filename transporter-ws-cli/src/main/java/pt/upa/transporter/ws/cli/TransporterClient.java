@@ -108,37 +108,7 @@ public class TransporterClient implements TransporterPortType{
 			BindingProvider bindingProvider = (BindingProvider) port;
 			Map<String, Object> requestContext = bindingProvider.getRequestContext();
 			requestContext.put(ENDPOINT_ADDRESS_PROPERTY, wsURL);
-			
-			setTimeouts(requestContext);
-			
 		}
-	}
-	
-	private void setTimeouts(Map<String, Object> requestContext){
-		
-		int connectionTimeout = 1000;
-        // The connection timeout property has different names in different versions of JAX-WS
-        // Set them all to avoid compatibility issues
-        final List<String> CONN_TIME_PROPS = new ArrayList<String>();
-        CONN_TIME_PROPS.add("com.sun.xml.ws.connect.timeout");
-        CONN_TIME_PROPS.add("com.sun.xml.internal.ws.connect.timeout");
-        CONN_TIME_PROPS.add("javax.xml.ws.client.connectionTimeout");
-        // Set timeout until a connection is established (unit is milliseconds; 0 means infinite)
-        for (String propName : CONN_TIME_PROPS)
-            requestContext.put(propName, connectionTimeout);
-        System.out.printf("Set connection timeout to %d milliseconds%n", connectionTimeout);
-
-        int receiveTimeout = 2000;
-        // The receive timeout property has alternative names
-        // Again, set them all to avoid compability issues
-        final List<String> RECV_TIME_PROPS = new ArrayList<String>();
-        RECV_TIME_PROPS.add("com.sun.xml.ws.request.timeout");
-        RECV_TIME_PROPS.add("com.sun.xml.internal.ws.request.timeout");
-        RECV_TIME_PROPS.add("javax.xml.ws.client.receiveTimeout");
-        // Set timeout until the response is received (unit is milliseconds; 0 means infinite)
-        for (String propName : RECV_TIME_PROPS)
-            requestContext.put(propName, 1000);
-        System.out.printf("Set receive timeout to %d milliseconds%n", receiveTimeout);
 	}
 	
 	

@@ -19,6 +19,8 @@ public class AbstractIT {
 	private static Properties PROPS;
 	protected static TransporterClient CLIENT;
 
+	protected static TransporterClient oddClient = null;
+	protected static TransporterClient evenClient = null;
 	protected static final int PRICE_UPPER_LIMIT = 100;
 	protected static final int PRICE_SMALLEST_LIMIT = 10;
 	protected static final int UNITARY_PRICE = 1;
@@ -31,6 +33,19 @@ public class AbstractIT {
 	protected static final String EMPTY_STRING = "";
 	protected static final int DELAY_LOWER = 1000; // milliseconds
 	protected static final int DELAY_UPPER = 5000; // milliseconds
+	protected static final String VALID_LOCATION = "Lisboa";
+	protected static final String NORTH_LOCATION = "Porto";
+	protected static final String SOUTH_LOCATION = "Faro";
+	protected static final String UNKNOWN_LOCATION = "Tavira";
+	protected static final String UNKNOWN_JOB_ID = "Unknown";
+	protected static final int NEGATIVE_PRICE = -1;
+	protected static final int VALID_PRICE = 50;
+	protected static final int HIGH_PRICE = 101;
+	protected static final int INDEX_ZERO = 0;
+	protected static final String TEST_STRING = "test";
+	protected final static int LOWER_THAN_TEN_PRICE = 9;
+	protected final static int EVEN_PRICE = 20;
+	protected final static int ODD_PRICE = 21;
 
 	@BeforeClass
 	public static void oneTimeSetup() throws Exception {
@@ -52,6 +67,10 @@ public class AbstractIT {
 
 		if ("true".equalsIgnoreCase(uddiEnabled)) {
 			CLIENT = new TransporterClient(uddiURL, wsName);
+			evenClient = new TransporterClient("http://localhost:9090","UpaTransporter2");
+			evenClient.setVerbose(true);
+			oddClient = new TransporterClient("http://localhost:9090","UpaTransporter1");
+			oddClient.setVerbose(true);
 		} else {
 			CLIENT = new TransporterClient(wsURL);
 		}

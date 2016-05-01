@@ -1,5 +1,6 @@
 package pt.upa.transporter.ws.it;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
@@ -18,4 +19,21 @@ public class PingIT extends AbstractIT {
 		assertNotNull(CLIENT.ping("test"));
 	}
 
+	/*
+	 * 	OUR TESTS
+	 */
+	@Test
+	public void testPingString(){
+		assertEquals(evenClient.ping(TEST_STRING), evenClient.getWsName()+" responding to ping request...Message given: "+TEST_STRING);
+	}
+	
+	@Test
+	public void testPingNull() throws Exception{
+		assertEquals(evenClient.ping(null), evenClient.getWsName()+" responding to ping request...Message given: "+null);
+	}
+	
+	@Test
+	public void testPingEmptyString(){
+		assertEquals(evenClient.ping(EMPTY_STRING), evenClient.getWsName()+" responding to ping request...Message given: ");
+	}
 }
