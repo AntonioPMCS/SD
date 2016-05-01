@@ -289,7 +289,6 @@ public class TransporterPort implements TransporterPortType{
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	
 	private void writeKey(String directory, String type, byte[] content) throws FileNotFoundException, IOException {
 		String directoryName = directory;
 		File dir = new File("target/classes/"+directoryName);
@@ -342,7 +341,6 @@ public class TransporterPort implements TransporterPortType{
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	
 	private byte[] readKeyFromDir(String directory) throws FileNotFoundException, IOException {
 		File dir = new File("target/classes/"+directory);
 		File keyFile = new File (dir, "public");
