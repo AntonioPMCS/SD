@@ -1,4 +1,4 @@
-package pt.upa.broker;
+package pt.upa.naming;
 
 import java.io.IOException;
 
@@ -6,29 +6,23 @@ import javax.xml.registry.JAXRException;
 import javax.xml.ws.Endpoint;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
-import pt.upa.broker.ws.BrokerPort;
-import pt.upa.broker.ws.BrokerPortType;
 
-public class BrokerEndpointManager {
+@SuppressWarnings("restriction")
+public class EndpointManager {
 	
 	/** UDDI naming server location */
 	private String uddiURL = null;
 	/** Web Service name */
 	private String wsName = null;
 
-	/** Get Web Service UDDI publication name */
-	public String getWsName() {
-		return wsName;
-	}
-
 	/** Web Service location to publish */
 	private String wsURL = null;
 
 	/** Port implementation */
-	private BrokerPort portImpl;
+	private Object portImpl;
 
 	/** Obtain Port implementation */
-	public BrokerPort getPort() {
+	public Object getPort() {
 		return portImpl;
 	}
 
@@ -56,23 +50,28 @@ public class BrokerEndpointManager {
 
 	/** constructor with provided UDDI location, WS name, and WS URL 
 	 * @throws JAXRException */
-	public BrokerEndpointManager(String uddiURL, String wsName, String wsURL) throws JAXRException {
+	public EndpointManager(String uddiURL, String wsName, String wsURL) throws JAXRException {
 		this.uddiURL = uddiURL;
 		this.wsName = wsName;
 		this.wsURL = wsURL;
-		portImpl = new BrokerPort(wsName, this);
-		
-		
+	}
+	
+	public void setPort(Object portImpl){
+		this.portImpl = portImpl;
 	}
 
 	/** constructor with provided web service URL */
-	public BrokerEndpointManager(String wsURL) {
+	public EndpointManager(String wsURL) {
 		if (wsURL == null)
 			throw new NullPointerException("Web Service URL cannot be null!");
-		
 		this.wsURL = wsURL;
 	}
 
+	/** Get Web Service UDDI publication name */
+	public String getWsName() {
+		return wsName;
+	}
+	
 	/* endpoint management */
 	public void start() throws Exception {
 		try {

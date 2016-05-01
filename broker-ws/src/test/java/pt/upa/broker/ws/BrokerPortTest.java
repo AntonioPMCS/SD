@@ -4,7 +4,7 @@ import org.junit.*;
 
 import com.sun.xml.bind.v2.schemagen.xmlschema.List;
 
-import pt.upa.broker.BrokerEndpointManager;
+import pt.upa.naming.EndpointManager;
 
 import static org.junit.Assert.*;
 
@@ -46,7 +46,7 @@ public class BrokerPortTest {
 
     @Before
     public void setUp() throws JAXRException {
-    	port = new BrokerPort(BROKER_NAME, new BrokerEndpointManager(WS_URL));
+    	port = new BrokerPort(BROKER_NAME, new EndpointManager(WS_URL));
     }
 
     @After

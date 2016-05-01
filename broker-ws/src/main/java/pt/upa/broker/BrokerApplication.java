@@ -1,7 +1,11 @@
 package pt.upa.broker;
 
+import pt.upa.broker.ws.BrokerPort;
+import pt.upa.naming.EndpointManager;
+
 public class BrokerApplication {
 
+	
 	public static void main(String[] args) throws Exception {
 		System.out.println(BrokerApplication.class.getSimpleName() + " starting...");
 		
@@ -16,21 +20,28 @@ public class BrokerApplication {
 		String wsURL = null;
 
 		// Create server implementation object, according to options
-		BrokerEndpointManager endpoint = null;
+		EndpointManager endpoint = null;
+		BrokerPort port;
 		if (args.length == 1) {
 			wsURL = args[0];
-			endpoint = new BrokerEndpointManager(wsURL);
+			endpoint = new EndpointManager(wsURL);
+			//TODO: é suposto adicionar o port certo?
+			
 		} else if (args.length >= 3) {
 			uddiURL = args[0];
 			wsName = args[1];
 			wsURL = args[2];
-			endpoint = new BrokerEndpointManager(uddiURL, wsName, wsURL);
+			endpoint = new EndpointManager(uddiURL, wsName, wsURL);
 			endpoint.setVerbose(true);
+			port = new BrokerPort(wsName, endpoint);
+			endpoint.setPort(port);
+			
+			
 		}
 
 		try {
 			endpoint.start();
-			endpoint.getPort().lookUpTransporterServices(); 
+			((BrokerPort) endpoint.getPort()).lookUpTransporterServices(); 
 			endpoint.awaitConnections();
 			
 		} finally {

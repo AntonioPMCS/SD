@@ -3,7 +3,7 @@ package pt.upa.broker.ws;
 import javax.jws.WebService;
 import javax.xml.registry.JAXRException;
 
-import pt.upa.broker.BrokerEndpointManager;
+import pt.upa.naming.EndpointManager;
 import pt.upa.transporter.ws.BadJobFault_Exception;
 import pt.upa.transporter.ws.BadLocationFault_Exception;
 import pt.upa.transporter.ws.BadPriceFault_Exception;
@@ -41,11 +41,11 @@ public class BrokerPort implements BrokerPortType{
 	public boolean alreadyCleanedFolder = false;
 	private String name;
 	private List<TransportView> transports = new ArrayList<TransportView>();
-	private BrokerEndpointManager endpointManager;
+	private EndpointManager endpointManager;
 	private ArrayList<String> endpoints = new ArrayList<String>();
 	private ArrayList<TransporterClient> transporterClients = new ArrayList<TransporterClient>();
 	
-	public BrokerPort(String name, BrokerEndpointManager endpointManager) throws JAXRException{
+	public BrokerPort(String name, EndpointManager endpointManager) throws JAXRException{
 		this.name=name;
 		this.endpointManager = endpointManager;
 		try {

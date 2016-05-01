@@ -1,5 +1,8 @@
 package pt.upa.transporter;
 
+import pt.upa.naming.EndpointManager;
+import pt.upa.transporter.ws.TransporterPort;
+
 public class TransporterApplication {
 
 	public static void main(String[] args) throws Exception {
@@ -17,16 +20,19 @@ public class TransporterApplication {
 		String wsURL = null;
 
 		// Create server implementation object, according to options
-		TransporterEndpointManager endpoint = null;
+		EndpointManager endpoint = null;
+		TransporterPort port = null;
 		if (args.length == 1) {
 			wsURL = args[0];
-			endpoint = new TransporterEndpointManager(wsURL);
+			endpoint = new EndpointManager(wsURL);
 		} else if (args.length >= 3) {
 			uddiURL = args[0];
 			wsName = args[1];
 			wsURL = args[2];
-			endpoint = new TransporterEndpointManager(uddiURL, wsName, wsURL);
+			endpoint = new EndpointManager(uddiURL, wsName, wsURL);
 			endpoint.setVerbose(true);
+			port = new TransporterPort(wsName);
+			endpoint.setPort(port);
 		}
 
 		try {

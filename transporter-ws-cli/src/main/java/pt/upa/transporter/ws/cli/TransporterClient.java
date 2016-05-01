@@ -118,6 +118,7 @@ public class TransporterClient implements TransporterPortType{
 	
 	@Override
 	public String ping(String name) {
+		//TODO: MUDAR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		this.wsName = port.ping(name).split(" ")[0];
 		
 		return port.ping(name);
