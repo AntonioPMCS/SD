@@ -122,6 +122,7 @@ public class BrokerClient implements BrokerPortType{
 
 	public String ping(String name) {
 		return port.ping(name);
+	
 	}
 
 	public String requestTransport(String origin, String destination, int price) 

@@ -9,7 +9,6 @@ import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 
 @SuppressWarnings("restriction")
 public class EndpointManager {
-	
 	/** UDDI naming server location */
 	private String uddiURL = null;
 	/** Web Service name */
