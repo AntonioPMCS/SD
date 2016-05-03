@@ -1,6 +1,7 @@
 package pt.upa.broker.ws;
 
 import javax.jws.WebService;
+import javax.jws.HandlerChain;
 import javax.xml.registry.JAXRException;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Response;
@@ -26,6 +27,7 @@ import java.util.concurrent.Future;
     targetNamespace="http://ws.broker.upa.pt/",
     serviceName="BrokerService"
 )
+@HandlerChain(file="/handler-chain.xml")
 
 public class BrokerPort implements BrokerPortType{
 	private String name;
@@ -40,7 +42,7 @@ public class BrokerPort implements BrokerPortType{
 	}
 	
 	public String ping (String word) {
-		String comeBack = name + "received from the transporters: " + '\n';
+		String comeBack = name + " received from the transporters: " + '\n';
 		for(TransporterClient transporter : transporterClients){
 			comeBack+= transporter.ping(word) + '\n';
 		}

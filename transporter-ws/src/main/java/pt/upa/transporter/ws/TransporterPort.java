@@ -7,6 +7,7 @@ import java.util.Timer;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.jws.WebService;
+import javax.jws.HandlerChain;
 
 
 @WebService(
@@ -17,6 +18,7 @@ import javax.jws.WebService;
 	    targetNamespace="http://ws.transporter.upa.pt/",
 	    serviceName="TransporterService"
 	)
+@HandlerChain(file="/handler-chain.xml")
 
 public class TransporterPort implements TransporterPortType{
 	private static final int ONE_SECOND = 1000;

@@ -8,6 +8,7 @@
   <modules>
   	<module>uddi-naming</module>
   	<module>cryptography-set</module>
+	<module>ws-handlers</module>
   </modules>
   
    <dependencies>
@@ -16,6 +17,13 @@
 		    <groupId>pt.ulisboa.tecnico.sdis</groupId>
 		    <artifactId>uddi-naming</artifactId>
 		    <version>1.0</version>
+		</dependency>
+
+		<!-- WS - Handlers -->
+		<dependency>
+		    <groupId>example</groupId>
+		    <artifactId>ws-handlers</artifactId>
+		    <version>1.0-SNAPSHOT</version>
 		</dependency>
  	</dependencies>
 </project>
