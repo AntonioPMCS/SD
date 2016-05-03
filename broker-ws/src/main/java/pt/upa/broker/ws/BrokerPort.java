@@ -42,14 +42,11 @@ public class BrokerPort implements BrokerPortType{
 	}
 	
 	public String ping (String word) {
-		/*
 		String comeBack = name + " received from the transporters: " + '\n';
 		for(TransporterClient transporter : transporterClients){
 			comeBack+= transporter.ping(word) + '\n';
 		}
 		return comeBack;
-		*/
-		return "hello"+word;
 	}
 
 	public String requestTransport (String origin, String destination, int price)
