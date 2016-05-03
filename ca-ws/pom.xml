@@ -49,6 +49,11 @@
             <artifactId>uddi-naming</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+        	<groupId>pt.upa.49</groupId>
+        	<artifactId>cryptography-set</artifactId>
+        	<version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     
     <build>

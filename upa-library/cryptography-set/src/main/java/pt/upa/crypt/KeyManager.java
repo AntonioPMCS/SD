@@ -18,10 +18,11 @@ public class KeyManager {
 	/**
 	 *  Generates an assymetric key par
 	 *  
+	 *  @param the name of the entity folder ex:ca-ws, broker-ws, transporter-ws
 	 *  @param publicKeyPath
 	 *  @param privateKeyPath
 	 */
-	public void generateRSAKeys(String name) throws Exception {
+	public void generateRSAKeys(String entity, int nr) throws Exception {
 
 		// generate RSA key pair
 		System.out.println("Generating RSA keys ...");
@@ -29,16 +30,30 @@ public class KeyManager {
 		keyGen.initialize(1024);
 		KeyPair key = keyGen.generateKeyPair();
 
-		System.out.println("Writing public key ...");
-		System.out.println(key.getPublic().toString());
-		byte[] pubEncoded = key.getPublic().getEncoded();
-		writeKey(name, "public", pubEncoded);
-
-		System.out.println("---");
-		
-		System.out.println("Writing private key ...");
-		byte[] privEncoded = key.getPrivate().getEncoded();
-		writeKey(name, "private", privEncoded);
+		if(entity.equals("transporter-ws")){
+			byte[] pubEncoded = key.getPublic().getEncoded();
+			writeKey("ca-ws", "Transporter", nr, "public", pubEncoded);
+			
+			byte[] privEncoded = key.getPrivate().getEncoded();
+			writeKey(entity, "Transporter", nr,"private", privEncoded);
+			
+		}else if(entity.equals("broker-ws")){
+			byte[] pubEncoded = key.getPublic().getEncoded();
+			writeKey("ca-ws", "Broker", nr, "public", pubEncoded);
+			
+			byte[] privEncoded = key.getPrivate().getEncoded();
+			writeKey(entity, "Broker", nr, "private", privEncoded);
+			
+		}else if(entity.equals("ca-ws")){
+			byte[] privEncoded = key.getPrivate().getEncoded();
+			writeKey("ca-ws", "CertificateAuthority", nr, "private", privEncoded);
+			
+			byte[] pubEncoded = key.getPublic().getEncoded();
+			writeKey("broker-ws", "CertificateAuthority", nr, "public", pubEncoded);
+			writeKey("broker-ws", "CertificateAuthority", nr, "public", pubEncoded);
+			writeKey("transporter-ws", "CertificateAuthority", nr, "public", pubEncoded);
+			writeKey("transporter-ws", "CertificateAuthority", nr, "public", pubEncoded);
+		}
 	}
 	
 	/**
@@ -50,9 +65,10 @@ public class KeyManager {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public void writeKey(String directory, String type, byte[] content) throws FileNotFoundException, IOException {
-		String directoryName = directory;
-		File dir = new File("target/classes/"+directoryName);
+	public void writeKey(String folder, String entity, int nr, String type, byte[] content) throws FileNotFoundException, IOException {
+		String directoryName = entity + type + String.valueOf(nr);
+		
+		File dir = new File("../"+folder+"/target/classes/"+directoryName);
 		
 		if (!dir.exists()) {
 		    System.out.println("creating directory: " + directoryName);

@@ -1,31 +1,12 @@
 package pt.upa.transporter.ws;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
-import java.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 
 import javax.jws.WebService;
-
-import org.junit.experimental.theories.Theories;
-
-import pt.upa.crypt.KeyManager;
 
 
 @WebService(
@@ -49,25 +30,16 @@ public class TransporterPort implements TransporterPortType{
 	private Timer timer = new Timer();
 	private static int id = 0;
 	private ArrayList<JobView> jobs = new ArrayList<JobView>();
-	private KeyManager keyManager;
 	
 	
 	
 	public TransporterPort(String name){
 		this.name=name;
 		int temp = Character.getNumericValue(name.charAt(14));
-		keyManager = new KeyManager();
 		
 		//Sets parity
 		if(temp % 2 == 0){parity = true;}
 		else{parity = false;}
-		
-		try {
-			keyManager.generateRSAKeys(name);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	@Override

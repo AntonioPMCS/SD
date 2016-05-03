@@ -30,12 +30,6 @@
     </properties>
 
     <dependencies>
-				 <!-- UDDI Naming -->
-				<dependency>
-				    <groupId>pt.ulisboa.tecnico.sdis</groupId>
-				    <artifactId>uddi-naming</artifactId>
-				    <version>1.0</version>
-				</dependency>
         <!-- JAX-WS -->
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
@@ -60,6 +54,12 @@
         <dependency>
         	<groupId>pt.upa.a49</groupId>
         	<artifactId>transporter-ws-cli</artifactId>
+        	<version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!-- Upa Library uddi-naming -->
+        <dependency>
+        	<groupId>pt.upa.49</groupId>
+        	<artifactId>uddi-naming</artifactId>
         	<version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
