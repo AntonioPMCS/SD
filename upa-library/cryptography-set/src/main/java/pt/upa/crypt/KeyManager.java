@@ -5,10 +5,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 public class KeyManager {
@@ -99,15 +102,26 @@ public class KeyManager {
 	 * @throws Exception
 	 */
 	public PublicKey getPublicKeyFromDirectory(String directory) throws Exception {
-
-		byte[] pubEncoded = readKeyFromDir(directory);
-
-		X509EncodedKeySpec pubSpec = new X509EncodedKeySpec(pubEncoded);
+		byte[] encoded = readKeyFromDir(directory);
+		X509EncodedKeySpec pubSpec = new X509EncodedKeySpec(encoded);
 		KeyFactory keyFacPub = KeyFactory.getInstance("RSA");
-		PublicKey pub = keyFacPub.generatePublic(pubSpec);
-		System.out.println(pub);
-		
-		return pub;
+		PublicKey key = keyFacPub.generatePublic(pubSpec);
+		return key;
+	}
+	
+	/**
+	 * Returns the public key existent in the given directory
+	 * 
+	 * @param publicKeyPath
+	 * @return pub The public key stored in the given path
+	 * @throws Exception
+	 */
+	public PrivateKey getPrivateKeyFromDirectory(String directory) throws Exception {
+		byte[] encoded = readKeyFromDir(directory);
+		PKCS8EncodedKeySpec privSpec = new PKCS8EncodedKeySpec(encoded);
+		KeyFactory keyFacPriv = KeyFactory.getInstance("RSA");
+		PrivateKey key = keyFacPriv.generatePrivate(privSpec);
+		return key;
 	}
 	
 	/**
