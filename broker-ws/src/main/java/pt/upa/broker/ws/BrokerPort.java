@@ -27,6 +27,7 @@ import java.util.concurrent.Future;
     targetNamespace="http://ws.broker.upa.pt/",
     serviceName="BrokerService"
 )
+
 public class BrokerPort implements BrokerPortType{
 	private String name;
 	private List<TransportView> transports = new ArrayList<TransportView>();
