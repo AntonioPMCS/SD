@@ -4,4 +4,5 @@
 			<handler-class>pt.upa.handlers.BrokerHandler</handler-class>
 		</handler>
 	</handler-chain>
-</handler-chains>   
+</handler-chains> 
+  

@@ -76,6 +76,7 @@ public class BrokerClient implements BrokerPortType{
 	
 	private void setTimeouts(Map<String, Object> requestContext){
 		
+		/*
 		int connectionTimeout = 1000;
         // The connection timeout property has different names in different versions of JAX-WS
         // Set them all to avoid compatibility issues
@@ -99,6 +100,7 @@ public class BrokerClient implements BrokerPortType{
         for (String propName : RECV_TIME_PROPS)
             requestContext.put(propName, 1000);
         System.out.printf("Set receive timeout to %d milliseconds%n", receiveTimeout);
+        */
 	}
 
 	/** WS service */
