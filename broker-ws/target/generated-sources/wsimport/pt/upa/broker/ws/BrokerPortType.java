@@ -3,6 +3,7 @@ package pt.upa.broker.ws;
 
 import java.util.List;
 import java.util.concurrent.Future;
+import javax.jws.HandlerChain;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -23,6 +24,7 @@ import javax.xml.ws.ResponseWrapper;
  * 
  */
 @WebService(name = "BrokerPortType", targetNamespace = "http://ws.broker.upa.pt/")
+@HandlerChain(file = "BrokerPortType_handler.xml")
 @XmlSeeAlso({
     ObjectFactory.class
 })
@@ -121,10 +123,10 @@ public interface BrokerPortType {
      * @param destination
      * @return
      *     returns java.lang.String
-     * @throws UnknownLocationFault_Exception
-     * @throws InvalidPriceFault_Exception
      * @throws UnavailableTransportFault_Exception
      * @throws UnavailableTransportPriceFault_Exception
+     * @throws InvalidPriceFault_Exception
+     * @throws UnknownLocationFault_Exception
      */
     @WebMethod
     @WebResult(targetNamespace = "")

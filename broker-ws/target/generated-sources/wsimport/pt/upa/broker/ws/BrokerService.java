@@ -3,6 +3,7 @@ package pt.upa.broker.ws;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import javax.jws.HandlerChain;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebEndpoint;
@@ -18,6 +19,7 @@ import javax.xml.ws.WebServiceFeature;
  * 
  */
 @WebServiceClient(name = "BrokerService", targetNamespace = "http://ws.broker.upa.pt/", wsdlLocation = "file:/home/goncalo/Desktop/SD/A_49-project/broker-ws/src/main/resources/broker.1_0.wsdl")
+@HandlerChain(file = "BrokerService_handler.xml")
 public class BrokerService
     extends Service
 {

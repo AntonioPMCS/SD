@@ -8,13 +8,9 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-/**
- * This SOAPHandler outputs the contents of inbound and outbound messages.
- */
 @SuppressWarnings("restriction")
-public class LogHandler implements SOAPHandler<SOAPMessageContext> {
-
-    public Set<QName> getHeaders() {
+public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
+	public Set<QName> getHeaders() {
         return null;
     }
 
