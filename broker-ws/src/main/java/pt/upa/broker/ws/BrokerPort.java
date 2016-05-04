@@ -211,8 +211,8 @@ public class BrokerPort implements BrokerPortType{
 			TransporterClient tc;
 			try {
 				tc = new TransporterClient(endpoint);
+				tc.setWsName();
 				transporterClients.add(tc);
-				tc.ping(" ");
 			} catch (TransporterClientException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

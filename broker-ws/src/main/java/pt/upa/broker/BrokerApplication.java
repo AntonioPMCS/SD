@@ -21,7 +21,7 @@ public class BrokerApplication {
 
 		// Create server implementation object, according to options
 		EndpointManager endpoint = null;
-		BrokerPort port;
+		BrokerPort port = null;
 		if (args.length == 1) {
 			wsURL = args[0];
 			endpoint = new EndpointManager(wsURL);
@@ -40,8 +40,10 @@ public class BrokerApplication {
 		}
 
 		try {
+			
 			endpoint.start();
-			((BrokerPort) endpoint.getPort()).lookUpTransporterServices(); 
+			((BrokerPort) endpoint.getPort()).lookUpTransporterServices();
+
 			endpoint.awaitConnections();
 			
 		} finally {

@@ -59,7 +59,7 @@ public class BaseBrokerIT {
 		oddClient = new TransporterClient("http://localhost:9090","UpaTransporter1");
 		oddClient.setVerbose(true);
 		
-		brokerClient = new BrokerClient("http://localhost:8085/broker-ws/endpoint");
+		brokerClient = new BrokerClient("http://localhost:8088/broker-ws/endpoint");
 	}
 
 	@AfterClass

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
@@ -62,7 +63,6 @@ public class TransporterClient implements TransporterPortType{
 		
 		this.wsURL = wsURL;
 		createStub();
-		
 	}
 
 	/** constructor with provided UDDI location and name */
@@ -111,16 +111,16 @@ public class TransporterClient implements TransporterPortType{
 		}
 	}
 	
-	
 	public String getWsName(){
 		return wsName;
 	}
 	
+	public void setWsName(){
+		this.wsName = port.ping(" ").split(" ")[0];
+	}
+	
 	@Override
 	public String ping(String name) {
-		//TODO: MUDAR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		this.wsName = port.ping(name).split(" ")[0];
-		
 		return port.ping(name);
 	}
 

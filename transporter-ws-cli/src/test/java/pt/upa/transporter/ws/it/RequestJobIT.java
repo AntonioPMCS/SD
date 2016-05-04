@@ -344,6 +344,7 @@ public class RequestJobIT extends AbstractIT {
 	
 	@Test
 	public void testRequestCorrectJobCreation() throws Exception{
+		evenClient.clearJobs();
 		evenClient.requestJob(VALID_LOCATION, VALID_LOCATION, VALID_PRICE);
 		assertEquals(1, evenClient.listJobs().size());
 	}
