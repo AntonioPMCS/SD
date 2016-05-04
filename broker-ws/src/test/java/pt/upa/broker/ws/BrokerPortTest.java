@@ -56,7 +56,7 @@ public class BrokerPortTest {
 
 
     // tests
-    @Test(expected = UnavailableTransportPriceFault_Exception.class)
+    @Test(expected = UnavailableTransportFault_Exception.class)
     public void testPriceTooHighNoJobs() throws Exception{
     	//since there is no communication with server, no JobViews will be supplied
     	port.requestTransport(INDIFFERENT_LOCATION, INDIFFERENT_LOCATION, HIGH_PRICE);
