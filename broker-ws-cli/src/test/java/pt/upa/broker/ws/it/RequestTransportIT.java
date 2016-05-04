@@ -21,7 +21,7 @@ public class RequestTransportIT extends BaseBrokerIT{
 		assertEquals(1, brokerClient.listTransports().size());
 	}
 	
-	@Test(expected = UnavailableTransportPriceFault_Exception.class)
+	@Test(expected = UnavailableTransportFault_Exception.class)
 	public void highPrice() throws Exception{
 		brokerClient.requestTransport(VALID_LOCATION, VALID_LOCATION, HIGH_PRICE);
 	}

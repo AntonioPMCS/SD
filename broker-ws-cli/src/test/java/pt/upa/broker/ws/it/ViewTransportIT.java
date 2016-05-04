@@ -15,10 +15,10 @@ public class ViewTransportIT extends BaseBrokerIT{
 
 	@Test
 	public void testViewTransport() throws Exception{
-		String[] result = brokerClient.requestTransport(VALID_LOCATION, VALID_LOCATION, VALID_EVEN_PRICE).split(" ");
-		String id = result[11];
+		String result = brokerClient.requestTransport(VALID_LOCATION, VALID_LOCATION, VALID_EVEN_PRICE);
 		
-		assertEquals(id,  brokerClient.viewTransport(id).getId());
+		
+		assertEquals(result,  brokerClient.viewTransport(result).getId());
 	}
 	
 	@Test(expected = UnknownTransportFault_Exception.class)

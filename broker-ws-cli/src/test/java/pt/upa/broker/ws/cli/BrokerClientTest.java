@@ -1,4 +1,4 @@
-package pt.up.broker.ws.cli;
+package pt.upa.broker.ws.cli;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

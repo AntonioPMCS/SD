@@ -202,8 +202,9 @@ public class TransporterPort implements TransporterPortType{
 		//Decide upon the offer
 		//Price is raised when transporter is Even and price not even
 		//of vice-versa -> XOR between them!
-		if(price > 10 && (parity ^ priceIsEven)){
-			raisePrice = true;
+		if(price > 10){
+			if(parity ^ priceIsEven)
+				raisePrice = true;
 		}
 		
 		return raisePrice;

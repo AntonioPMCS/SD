@@ -34,6 +34,9 @@ public class BrokerPort implements BrokerPortType{
 	private ArrayList<String> endpoints = new ArrayList<String>();
 	private ArrayList<TransporterClient> transporterClients = new ArrayList<TransporterClient>();
 	
+	public ArrayList<TransporterClient> getTransporters(){
+		return transporterClients;
+	}
 	public BrokerPort(String name, EndpointManager endpointManager) throws JAXRException{
 		this.name=name;
 		this.endpointManager = endpointManager;
@@ -50,6 +53,7 @@ public class BrokerPort implements BrokerPortType{
 	public String requestTransport (String origin, String destination, int price)
 		throws InvalidPriceFault_Exception, UnavailableTransportFault_Exception, UnavailableTransportPriceFault_Exception, UnknownLocationFault_Exception {
 	
+		
 		TransportView chosenRequest = null;
 		try{
 			
@@ -73,7 +77,7 @@ public class BrokerPort implements BrokerPortType{
 			//IF only null responses
 			if(tempJobs.size() == 0){
 				if(price > 100)
-					throw new UnavailableTransportPriceFault_Exception("ERROR: Price request too high.", new UnavailableTransportPriceFault());
+					throw new UnavailableTransportFault_Exception("ERROR: Price request too high.", new UnavailableTransportFault());
 				else 
 					throw new UnavailableTransportFault_Exception("ERROR: Transporters don't operate on request areas.", new UnavailableTransportFault());
 			}
@@ -105,6 +109,7 @@ public class BrokerPort implements BrokerPortType{
 			else{
 				chosenRequest = chosenTransportView(chosenTransporter, requests);
 				chosenRequest.setState(TransportStateView.BOOKED);
+				chosenRequest.setPrice(chosenTransporter.getJobPrice());
 				transports.add(chosenRequest);
 				
 				//Contact Transporters, accepting or denying
@@ -133,7 +138,7 @@ public class BrokerPort implements BrokerPortType{
 			throw new UnavailableTransportFault_Exception("ERROR: Transporter Service doesn't know a given transport ID "+e.getMessage(), new UnavailableTransportFault());
 		} 
 	
-		return "#-> Transport service successfully requested. Your transport has the following id: "+chosenRequest.getId();
+		return chosenRequest.getId();
 	}
 
 	public TransportView viewTransport (String id) throws UnknownTransportFault_Exception {
