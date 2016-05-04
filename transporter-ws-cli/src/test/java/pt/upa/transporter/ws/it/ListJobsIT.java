@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class ListJobsIT extends BaseTransporterIT{
+public class ListJobsIT extends AbstractIT{
 	
 	@Test
 	public void testListJobsNoJobs(){

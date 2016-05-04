@@ -8,7 +8,7 @@ import pt.upa.transporter.ws.BadJobFault_Exception;
 import pt.upa.transporter.ws.JobStateView;
 import pt.upa.transporter.ws.JobView;
 
-public class DecideJobIT extends BaseTransporterIT{
+public class DecideJobIT extends AbstractIT{
 
 	@Test(expected = BadJobFault_Exception.class)
 	public void testDecideJobUnknownID() throws Exception{

@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class ClearJobsIT extends BaseTransporterIT{
+public class ClearJobsIT extends AbstractIT{
 
 	@Test
 	public void testJobDeletion() throws Exception{
