@@ -20,7 +20,7 @@ import pt.upa.ca.ws.cli.AuthorityClient;
 import pt.upa.crypt.Cypher;
 import pt.upa.crypt.Digest;
 import pt.upa.crypt.SecureRandomGen;
-import static javax.xml.bind.DatatypeConverter.printHexBinary;
+import static javax.xml.bind.DatatypeConverter.printBase64Binary;
 
 @SuppressWarnings("restriction")
 public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
@@ -30,6 +30,7 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
 	private final String BROKER_KEY_PASS = "1nsecure";
 	private final String BROKER_CERTIFICATE_ALIAS = "UpaBroker";
 	private final String CA_CERTIFICATE_ALIAS = "UpaBroker";
+	private final String SCHEMA_PREFIX = "Teste";
 	
 	public Set<QName> getHeaders() {
         return null;
@@ -64,7 +65,11 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
 
     private void handleOutgoingMsg(SOAPMessageContext smc) {
     	SOAPMessage message = smc.getMessage();
+    	
     	try {
+    		SOAPPart sp = message.getSOAPPart();
+            SOAPEnvelope se = sp.getEnvelope();
+            
     		//Get Keystore
     		String keystoreFilename = "./UpaBrokerSecurity/UpaBroker.jks";
     	    FileInputStream fIn = new FileInputStream(keystoreFilename);
@@ -83,6 +88,7 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
     	    if(cert == null){
     	    	System.out.println("Certificate "+brokerCertName+" doesn't exist.");
     	    }
+    	    byte[] certificate = cert.getEncoded();
     	    
     	    //Gets CA Certificate
     	    String CACertName = CA_CERTIFICATE_ALIAS;
@@ -106,17 +112,29 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
 			//Get Private Key from Broker Certificate
 			PrivateKey pk = (PrivateKey) keystore.getKey("UpaBroker", BROKER_KEY_PASS.toCharArray());
 			
+			//Cipher nounce and msg
 			Cypher cypher = new Cypher();
-			
 			byte[] cipheredRandom = cypher.cypherWithPrivateKey(random, pk);
 			byte[] cipheredDigestMsg = cypher.cypherWithPrivateKey(digestedMsg, pk);
 			
-			System.out.println(printHexBinary(random));
-			System.out.println(printHexBinary(cipheredRandom));
-			System.out.println(printHexBinary(digestedMsg));
-			System.out.println(printHexBinary(cipheredDigestMsg));
-			//Put result on soad header
+			System.out.println(printBase64Binary(cipheredRandom));
+			System.out.println(printBase64Binary(cipheredDigestMsg));
 			
+            //Add header
+            SOAPHeader sh = se.getHeader();
+            if (sh == null)
+                sh = se.addHeader();
+
+            // add header element (name, namespace prefix, namespace)
+            SOAPHeaderElement security = sh.addHeaderElement(new QName("Broker", "Certificate", SCHEMA_PREFIX));
+            SOAPHeaderElement nounce = sh.addHeaderElement(new QName("Broker", "Nounce", SCHEMA_PREFIX));
+            SOAPHeaderElement digest = sh.addHeaderElement(new QName("Broker", "Digest", SCHEMA_PREFIX));
+            SOAPElement headerCert = security.addChildElement("BrokerCertificate", SCHEMA_PREFIX);
+            headerCert.addTextNode(printBase64Binary(certificate));
+            SOAPElement headerRandom = nounce.addChildElement("CipheredRandom", SCHEMA_PREFIX);
+            headerRandom.addTextNode(printBase64Binary(cipheredRandom));
+            SOAPElement headerDigest = digest.addChildElement("CipheredDigest", SCHEMA_PREFIX);
+            headerDigest.addTextNode(printBase64Binary(cipheredDigestMsg));
 		} catch (Exception e1) {
 			System.out.printf("Exception in handler: %s%n", e1);
 		} 
