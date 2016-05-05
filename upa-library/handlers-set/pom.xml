@@ -7,4 +7,16 @@
   </parent>
   <artifactId>handlers-set</artifactId>
   <name>handlers-set</name>
+  <dependencies>
+  	<dependency>
+  		<groupId>pt.upa.49</groupId>
+  		<artifactId>cryptography-set</artifactId>
+  		<version>1.0-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>pt.upa.49</groupId>
+  		<artifactId>ca-ws-cli</artifactId>
+  		<version>1.0-SNAPSHOT</version>
+  	</dependency>
+  </dependencies>
 </project>
