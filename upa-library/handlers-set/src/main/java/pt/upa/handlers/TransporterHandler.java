@@ -123,18 +123,18 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 			CertificateFactory cf   = CertificateFactory.getInstance("X.509");
 			Certificate brokerCert = cf.generateCertificate(new ByteArrayInputStream(brokerCertByteArray));
 			
-			System.out.println(brokerCert);
 			//Get Public Key of Central Authority Certificate
 			//TODO: Fazer para consoante o caso ir à pasta transporter1 ou transporter2
 			String keystoreFilename = "./TransporterSecurity/UpaTransporter1/UpaTransporter1.jks";
     	    FileInputStream fIn = new FileInputStream(keystoreFilename);
     	    KeyStore keystore = KeyStore.getInstance("JKS");
     	    keystore.load(fIn, TRANSPORTER_STORE_PASS.toCharArray());
-    	    PublicKey caPublicKey = (PublicKey) keystore.getKey(CA_ALIAS, CA_KEY_PASS.toCharArray());
-			
-    	    System.out.println("CHAVE PUBLICA CA");
-    	    System.out.println(caPublicKey.toString());
-    	    /*
+    	    
+    	    Certificate caCertificate = keystore.getCertificate("ca");
+    	    PublicKey caPublicKey = caCertificate.getPublicKey();
+    	    System.out.println("Chave pubulica CA");
+    	    System.out.println(caPublicKey);
+    	    
     	    brokerCert.verify(caPublicKey);
     	    
     	    //Decipher nounce and digest
@@ -158,10 +158,6 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 			}
 				
 			System.out.println("Ok está tudo bem!!");
-    	    */
-			
-			
-			
 			
     	}catch (Exception e){
     		System.out.println(e.getMessage());
