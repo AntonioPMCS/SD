@@ -1,18 +1,25 @@
 package pt.upa.crypt;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 public class KeyManager {
 
@@ -140,5 +147,33 @@ public class KeyManager {
 		fis.read(content);
 		fis.close();
 		return content;
+	}
+	
+	/*
+	 * 
+	 */
+	public String getStringKeyFromFile(String filename) throws IOException {
+	    // Read key from file
+	    String strKeyPEM = "";
+	    BufferedReader br = new BufferedReader(new FileReader(filename));
+	    String line;
+	    while ((line = br.readLine()) != null) {
+	        strKeyPEM += line + "\n"; // + \n??????
+	    }
+	    br.close();
+	    return strKeyPEM;
+	}
+	
+	/*
+	 * 
+	 */
+	public PublicKey getPublicKeyFromString(String key) throws IOException, GeneralSecurityException {
+	    String publicKeyPEM = key;
+	    publicKeyPEM = publicKeyPEM.replace("-----BEGIN PUBLIC KEY-----\n", "");
+	    publicKeyPEM = publicKeyPEM.replace("-----END PUBLIC KEY-----", "");
+	    byte[] encoded = Base64.getDecoder().decode(publicKeyPEM);
+	    KeyFactory kf = KeyFactory.getInstance("RSA");
+	    PublicKey publicKey = (PublicKey) kf.generatePublic(new PKCS8EncodedKeySpec(encoded));
+	    return publicKey;
 	}
 }

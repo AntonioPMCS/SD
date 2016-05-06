@@ -2,6 +2,7 @@ package pt.upa.ca.ws.cli;
 
 import static javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY;
 
+import java.security.cert.Certificate;
 import java.util.Map;
 
 import javax.xml.ws.BindingProvider;
@@ -112,5 +113,17 @@ public class AuthorityClient implements Authority {
 		
 		return port.ping(msg);
 	}
+
+	@Override
+	public byte[] getTransporterCertificate(int arg0) {
+		return port.getTransporterCertificate(1);
+	}
+
+	@Override
+	public byte[] getBrokerCertificate() {
+		return port.getBrokerCertificate();
+	}
+	
+	
 
 }

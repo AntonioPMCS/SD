@@ -83,6 +83,7 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
     	    		 */
     	    
     	    //Gets Broker Certificate
+    	    /*NAO PRECISAS CERTO?
     	    String brokerCertName = BROKER_CERTIFICATE_ALIAS;
     	    Certificate cert = keystore.getCertificate(brokerCertName);
     	    if(cert == null){
@@ -90,12 +91,13 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
     	    }
     	    byte[] certificate = cert.getEncoded();
     	    
+    	    /*NAO TENS DE TER AQUI O CERTIFICADO DA CA CERTO?
     	    //Gets CA Certificate
     	    String CACertName = CA_CERTIFICATE_ALIAS;
     	    Certificate cert2 = keystore.getCertificate(CACertName);
     	    if(cert2 == null){
     	    	System.out.println("Certificate "+CACertName+" doesn't exist.");
-    	    }
+    	    }*/
     	    
         	//Convert Soap msg passed to string
 			message.writeTo(baos);
@@ -117,20 +119,19 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
 			byte[] cipheredRandom = cypher.cypherWithPrivateKey(random, pk);
 			byte[] cipheredDigestMsg = cypher.cypherWithPrivateKey(digestedMsg, pk);
 			
-			System.out.println(printBase64Binary(cipheredRandom));
-			System.out.println(printBase64Binary(cipheredDigestMsg));
-			
             //Add header
             SOAPHeader sh = se.getHeader();
             if (sh == null)
                 sh = se.addHeader();
 
             // add header element (name, namespace prefix, namespace)
-            SOAPHeaderElement security = sh.addHeaderElement(new QName("Broker", "Certificate", SCHEMA_PREFIX));
+            
+            //SOAPHeaderElement security = sh.addHeaderElement(new QName("Broker", "Certificate", SCHEMA_PREFIX));
             SOAPHeaderElement nounce = sh.addHeaderElement(new QName("Broker", "Nounce", SCHEMA_PREFIX));
             SOAPHeaderElement digest = sh.addHeaderElement(new QName("Broker", "Digest", SCHEMA_PREFIX));
-            SOAPElement headerCert = security.addChildElement("BrokerCertificate", SCHEMA_PREFIX);
-            headerCert.addTextNode(printBase64Binary(certificate));
+           
+            //SOAPElement headerCert = security.addChildElement("BrokerCertificate", SCHEMA_PREFIX);
+            //headerCert.addTextNode(printBase64Binary(certificate));
             SOAPElement headerRandom = nounce.addChildElement("CipheredRandom", SCHEMA_PREFIX);
             headerRandom.addTextNode(printBase64Binary(cipheredRandom));
             SOAPElement headerDigest = digest.addChildElement("CipheredDigest", SCHEMA_PREFIX);
