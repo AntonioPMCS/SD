@@ -75,34 +75,12 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
     	    FileInputStream fIn = new FileInputStream(keystoreFilename);
     	    KeyStore keystore = KeyStore.getInstance("JKS");
     	    keystore.load(fIn, BROKER_STORE_PASS.toCharArray());
-    	    		/*
-    	    		 * tens em keystore a key store UpaBroker.jks onde tens:
-    	    		 * - Certificado da CA
-    	    		 * - Seu próprio Certificado
-    	    		 * - a sua chave privada
-    	    		 */
     	    
-    	    //Gets Broker Certificate
-    	    /*NAO PRECISAS CERTO?
-    	    String brokerCertName = BROKER_CERTIFICATE_ALIAS;
-    	    Certificate cert = keystore.getCertificate(brokerCertName);
-    	    if(cert == null){
-    	    	System.out.println("Certificate "+brokerCertName+" doesn't exist.");
-    	    }
-    	    byte[] certificate = cert.getEncoded();
     	    
-    	    /*NAO TENS DE TER AQUI O CERTIFICADO DA CA CERTO?
-    	    //Gets CA Certificate
-    	    String CACertName = CA_CERTIFICATE_ALIAS;
-    	    Certificate cert2 = keystore.getCertificate(CACertName);
-    	    if(cert2 == null){
-    	    	System.out.println("Certificate "+CACertName+" doesn't exist.");
-    	    }*/
-    	    
-        	//Convert Soap msg passed to string
 			message.writeTo(baos);
 			String convertedSoap = baos.toString();
-			
+			System.out.println("SOAP MSG");
+			System.out.println(convertedSoap);
 			//Generate Nounce (byte array)
 			SecureRandomGen generator = new SecureRandomGen();
 			byte[] random = generator.getRandomNumber();

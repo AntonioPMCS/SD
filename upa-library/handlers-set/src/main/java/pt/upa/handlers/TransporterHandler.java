@@ -25,18 +25,22 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.xml.namespace.QName;
+import javax.xml.soap.MessageFactory;
 import javax.xml.soap.Node;
+
 import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
+import javax.xml.soap.SOAPPart;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
-
+import java.security.MessageDigest;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
+import static javax.xml.bind.DatatypeConverter.printHexBinary;
 import pt.upa.ca.ws.cli.AuthorityClient;
 import pt.upa.ca.ws.cli.AuthorityClientException;
 import pt.upa.crypt.Cypher;
@@ -92,10 +96,14 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
     private void handleIncomingMsg(SOAPMessageContext smc){
     	Map<String, String> headerElements = new HashMap<String, String>();
     	SOAPMessage message = smc.getMessage();
+    	SOAPPart sp = message.getSOAPPart();
+    	
+    	
     	
     	try{
+    		SOAPEnvelope se = sp.getEnvelope();
     		SOAPBody sb = message.getSOAPBody();
-    		SOAPHeader sh;
+    		SOAPHeader sh = message.getSOAPHeader();
     		
     		//Get Elements from header
     		sh = message.getSOAPHeader();
@@ -105,9 +113,10 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 				
 				Node node=(Node)it.next();
 				NodeList list2 = node.getChildNodes();
-				 
+				
 				for(int i = 0; i < list2.getLength(); i++){
 					Element ele=(Element)node;
+			
 					headerElements.put(ele.getLocalName(), ele.getTextContent());
 				}
 			}
@@ -122,6 +131,7 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 			byte[] brokerCertByteArray = authority.getBrokerCertificate();
 			CertificateFactory cf   = CertificateFactory.getInstance("X.509");
 			Certificate brokerCert = cf.generateCertificate(new ByteArrayInputStream(brokerCertByteArray));
+			PublicKey brokerPubKey = brokerCert.getPublicKey();
 			
 			//Get Public Key of Central Authority Certificate
 			//TODO: Fazer para consoante o caso ir à pasta transporter1 ou transporter2
@@ -132,8 +142,6 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
     	    
     	    Certificate caCertificate = keystore.getCertificate("ca");
     	    PublicKey caPublicKey = caCertificate.getPublicKey();
-    	    System.out.println("Chave pubulica CA");
-    	    System.out.println(caPublicKey);
     	    
     	    brokerCert.verify(caPublicKey);
     	    
@@ -141,18 +149,21 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
     	    Cypher cypher = new Cypher();
     	    byte[] digestResult = parseBase64Binary(digest);
     	    byte[] nounceResult = parseBase64Binary(nounce);
-    	    byte[] decipheredDigestResult = cypher.decipherWithPublicKey(digestResult, caPublicKey);
-    	    byte[] decipheredNounceResult = cypher.decipherWithPublicKey(nounceResult, caPublicKey);
+    	    byte[] decipheredDigestResult = cypher.decipherWithPublicKey(digestResult, brokerPubKey);
+    	    byte[] decipheredNounceResult = cypher.decipherWithPublicKey(nounceResult, brokerPubKey);
     	    
-    	    //make new digest from soap body
+    	    sh.removeContents();
+    	    message.saveChanges();
+    	    
     	    message.writeTo(baos);
 			String convertedSoap = baos.toString();
 			
 			Digest digestor = new Digest();
 			byte[] digestedMsg = digestor.digestMessage(convertedSoap);
-			
+
+			MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
 			//CHeck if they are equals
-			if(digestedMsg != decipheredDigestResult){
+			if(!messageDigest.isEqual(digestedMsg, decipheredDigestResult)){
 				//TODO: Throw SOAP Fault
 				System.out.println("ERRO: Sao diferentes...nao é suposto");
 			}
@@ -161,6 +172,7 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 			
     	}catch (Exception e){
     		System.out.println(e.getMessage());
+    		e.printStackTrace();
 		}
 		
 		
