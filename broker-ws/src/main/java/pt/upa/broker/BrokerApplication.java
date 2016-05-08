@@ -43,7 +43,7 @@ public class BrokerApplication {
 			
 			endpoint.start();
 			((BrokerPort) endpoint.getPort()).lookUpTransporterServices();
-
+			((BrokerPort) endpoint.getPort()).ping("hello");
 			endpoint.awaitConnections();
 			
 		} finally {

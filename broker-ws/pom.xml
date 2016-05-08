@@ -57,15 +57,15 @@
         	<version>1.0-SNAPSHOT</version>
         </dependency>
         <!-- Upa Library uddi-naming -->
-        <dependency>
-        	<groupId>pt.upa.49</groupId>
-        	<artifactId>uddi-naming</artifactId>
-        	<version>1.0-SNAPSHOT</version>
-        </dependency>
 		<!-- WS Handlers -->
 		<dependency>
 			<groupId>pt.upa.49</groupId>
 			<artifactId>handlers-set</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>pt.upa.49</groupId>
+			<artifactId>uddi-naming</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
     </dependencies>

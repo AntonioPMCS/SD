@@ -1,5 +1,6 @@
 package pt.upa.transporter.ws;
 
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +33,8 @@ public class TransporterPort implements TransporterPortType{
 	private Timer timer = new Timer();
 	private static int id = 0;
 	private ArrayList<JobView> jobs = new ArrayList<JobView>();
+	
+	public static Certificate brokerCert = null;
 	
 	
 	

@@ -16,27 +16,34 @@ public class AuthorityImpl implements Authority{
 	private String name = "CertificateAuthority";
 	private final String BROKER_CERTIFICATE_ALIAS = "UpaBroker";
 	private Certificate brokerCert;
+	private Certificate transporter1Cert;
+	private Certificate transporter2Cert;
 	private KeyStore keystore;
 	
 	public AuthorityImpl(){
-		
-		//Get broker Certificate
 		CertificateFactory fact;
 		try {
 			fact = CertificateFactory.getInstance("X.509");
+			
+			//Get broker Certificate
+			System.out.println("Obtaining broker certificate...");
 			FileInputStream is = new FileInputStream ("./CASecurity/UpaBroker.cer");
 			brokerCert = fact.generateCertificate(is);
-		    System.out.println(brokerCert);
+			
+			System.out.println("Obtaining transporter1 certificate...");
+			//Get Transporter1 Certificate
+			is = new FileInputStream ("./CASecurity/UpaTransporter1.cer");
+			transporter1Cert = fact.generateCertificate(is);
+			
+			System.out.println("Obtaining transporter2 certificate...");
+			//Get Transporter2 Certificate
+			is = new FileInputStream ("./CASecurity/UpaTransporter2.cer");
+			transporter2Cert = fact.generateCertificate(is);
 		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	    
-	    
-	    
 	}
 
 	public String ping(String msg) {
@@ -48,7 +55,6 @@ public class AuthorityImpl implements Authority{
 		try {
 			return brokerCert.getEncoded();
 		} catch (CertificateEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -56,7 +62,14 @@ public class AuthorityImpl implements Authority{
 
 	@Override
 	public byte[] getTransporterCertificate(int nr) {
-		// TODO Auto-generated method stub
+		try{
+			switch(nr){
+				case 1 : return transporter1Cert.getEncoded();
+				case 2 : return transporter2Cert.getEncoded();
+			}
+		} catch (CertificateEncodingException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 }

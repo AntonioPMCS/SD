@@ -9,6 +9,8 @@ import pt.upa.broker.ws.UnavailableTransportFault_Exception;
 import pt.upa.broker.ws.UnavailableTransportPriceFault_Exception;
 import pt.upa.broker.ws.UnknownLocationFault_Exception;
 import pt.upa.broker.ws.UnknownTransportFault_Exception;
+import pt.upa.handlers.BrokerHandler;
+import pt.upa.handlers.TransporterHandler;
 
 import static javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY;
 
@@ -32,6 +34,7 @@ public class BrokerClient implements BrokerPortType{
 		this.wsName = wsName;
 		uddiLookup();
 		createStub();
+		setTransporterContext();
 	}
 
 	/** UDDI lookup */
@@ -156,6 +159,11 @@ public class BrokerClient implements BrokerPortType{
 		this.verbose = verbose;
 	}
 
+	public void setTransporterContext(){
+		BindingProvider bindingProvider = (BindingProvider) port;
+		Map<String, Object> requestContext = bindingProvider.getRequestContext();
+		requestContext.put(TransporterHandler.TRANSPORTER_NAME_PROPERTY, wsName);
+	}
 
 
 }

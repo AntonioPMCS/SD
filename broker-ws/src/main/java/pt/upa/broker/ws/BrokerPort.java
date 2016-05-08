@@ -6,6 +6,8 @@ import javax.xml.registry.JAXRException;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Response;
 
+import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
+import pt.ulisboa.tecnico.sdis.ws.uddi.UDDIRecord;
 import pt.upa.naming.EndpointManager;
 import pt.upa.transporter.ws.BadJobFault_Exception;
 import pt.upa.transporter.ws.BadLocationFault_Exception;
@@ -32,7 +34,6 @@ public class BrokerPort implements BrokerPortType{
 	private String name;
 	private List<TransportView> transports = new ArrayList<TransportView>();
 	private EndpointManager endpointManager;
-	private ArrayList<String> endpoints = new ArrayList<String>();
 	private ArrayList<TransporterClient> transporterClients = new ArrayList<TransporterClient>();
 	
 	public ArrayList<TransporterClient> getTransporters(){
@@ -211,13 +212,12 @@ public class BrokerPort implements BrokerPortType{
 	 */
 	public void lookUpTransporterServices() throws JAXRException{
 		
-		for(String endpoint : endpointManager.getUddiNaming().list("UpaTransporter%")){
-			endpoints.add(endpoint);
-		
+		for(UDDIRecord uddiRecord : endpointManager.getUddiNaming().listRecords("UpaTransporter%")){
+			System.out.println("Looking for transporterServices");
 			TransporterClient tc;
 			try {
-				tc = new TransporterClient(endpoint);
-				tc.setWsName();
+				System.out.println("Adding transporter "+uddiRecord.getOrgName() + " to available transporter services.");
+				tc = new TransporterClient(uddiRecord.getUrl(), uddiRecord.getOrgName());
 				transporterClients.add(tc);
 			} catch (TransporterClientException e) {
 				// TODO Auto-generated catch block
