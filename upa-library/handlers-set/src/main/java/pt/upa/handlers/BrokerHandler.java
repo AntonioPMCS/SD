@@ -40,13 +40,11 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
 	AuthorityClient authority = null;
 	private final String BROKER_STORE_PASS = "ins3cur3";
 	private final String BROKER_KEY_PASS = "1nsecure";
-	private final String BROKER_CERTIFICATE_ALIAS = "UpaBroker";
-	private final String CA_CERTIFICATE_ALIAS = "UpaBroker";
 	private final String SCHEMA_PREFIX = "Teste";
-	private Certificate caCertificate = null;
-	private static final String TRANSPORTER1_CERTICATE_PROPERTY = "transporter1Certificate";
-	private static final String TRANSPORTER2_CERTIFICATE_PROPERTY = "transporter2Certicate";
 	public static final String  TRANSPORTER_NAME_PROPERTY = "transporterName";
+	public String tName = null;
+	private Certificate tCert1 = null;
+	private Certificate tCert2 = null;
 	
 	public Set<QName> getHeaders() {
         return null;
@@ -55,18 +53,15 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
     public boolean handleMessage(SOAPMessageContext smc) {
     	System.out.println("#------------------------------------------------------------------------#");
     	Boolean outbound = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+    	
     	try {
 			authority = new AuthorityClient("http://localhost:8086/ca-ws/endpoint");
 		} catch (AuthorityClientException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        
     	if (outbound) {
-            System.out.println("Outbound SOAP message:");
             handleOutgoingMsg(smc);
         } else {
-            System.out.println("Inbound SOAP message:");
             handleIncomingMsg(smc);
         }
     	
@@ -74,7 +69,6 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
     }
 
     public boolean handleFault(SOAPMessageContext smc) {
-        //logToSystemOut(smc);
         return true;
     }
 
@@ -84,7 +78,8 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
 
     private void handleOutgoingMsg(SOAPMessageContext smc) {
     	SOAPMessage message = smc.getMessage();
-    	
+    	tName = (String) smc.get(TRANSPORTER_NAME_PROPERTY);
+    	baos.reset();
     	try {
     		SOAPPart sp = message.getSOAPPart();
             SOAPEnvelope se = sp.getEnvelope();
@@ -126,7 +121,7 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
             SOAPHeaderElement digest = sh.addHeaderElement(new QName("Broker", "Digest", SCHEMA_PREFIX));
            
             SOAPElement headerName = transporter.addChildElement("TransporterName", SCHEMA_PREFIX);
-            headerName.addTextNode(getTransporterNameFromContext(smc));
+            headerName.addTextNode(tName);
             SOAPElement headerRandom = nounce.addChildElement("CipheredRandom", SCHEMA_PREFIX);
             headerRandom.addTextNode(printBase64Binary(cipheredRandom));
             SOAPElement headerDigest = digest.addChildElement("CipheredDigest", SCHEMA_PREFIX);
@@ -141,7 +136,7 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
     	Map<String, String> headerElements = new HashMap<String, String>();
     	SOAPMessage message = smc.getMessage();
     	SOAPPart sp = message.getSOAPPart();
-    	
+    	baos.reset();
     	try{
     		SOAPEnvelope se = sp.getEnvelope();
     		SOAPBody sb = message.getSOAPBody();
@@ -171,21 +166,27 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
 			
 			//Get TransporterName
 			String tName = headerElements.get("TransporterName");
-			
+			System.out.println("NOME");
+			System.out.println(tName);
 			//Get Transporter Certificate from context
-			Certificate tCert = getTransporterCertificateFromContext(smc, tName);
-			if(tCert == null){
-				System.out.println("Pediste certificate transporter à CA");
-				//If context doesn't has it, call Central Authority
-				int nrCertificate = (tName.equals("UpaTransporter1")) ? 1 : 2;
-				byte[] brokerCertByteArray = authority.getTransporterCertificate(nrCertificate);
+			if(tName.equals("UpaTransporter1") && tCert1 == null){
+				System.out.println("Asked "+tName+" certificate to CA.");
+				byte[] brokerCertByteArray = authority.getTransporterCertificate(1);
 				CertificateFactory cf   = CertificateFactory.getInstance("X.509");
-				tCert = cf.generateCertificate(new ByteArrayInputStream(brokerCertByteArray));
-				
-				//PutCertificate in context so we don't have to ask for it again to the CA
-				smc.put((nrCertificate == 1) ? TRANSPORTER1_CERTICATE_PROPERTY : TRANSPORTER2_CERTIFICATE_PROPERTY, tCert);
-				smc.setScope((nrCertificate == 1) ? TRANSPORTER1_CERTICATE_PROPERTY : TRANSPORTER2_CERTIFICATE_PROPERTY, Scope.APPLICATION);
+				tCert1 = cf.generateCertificate(new ByteArrayInputStream(brokerCertByteArray));
 			}
+			else if(tName.equals("UpaTransporter2") && tCert2 == null){
+				System.out.println("Asked "+tName+" certificate to CA.");
+				byte[] brokerCertByteArray = authority.getTransporterCertificate(2);
+				CertificateFactory cf   = CertificateFactory.getInstance("X.509");
+				tCert2 = cf.generateCertificate(new ByteArrayInputStream(brokerCertByteArray));
+			}
+			
+			Certificate tCert = null;
+			if(tName.equals("UpaTransporter1"))
+				tCert = tCert1;
+			else if(tName.equals("UpaTransporter2"))
+				tCert = tCert2;
 			
 			PublicKey tPubKey = tCert.getPublicKey();
 	    	
@@ -195,8 +196,6 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
     	    KeyStore keystore = KeyStore.getInstance("JKS");
     	    keystore.load(fIn, BROKER_STORE_PASS.toCharArray());
     	    Certificate caCertificate = keystore.getCertificate("ca");
-    	    
-    	    
     	    PublicKey caPublicKey = caCertificate.getPublicKey();
     	    
     	    tCert.verify(caPublicKey);
@@ -229,63 +228,4 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
     		e.printStackTrace();
 		}
     }
-    
-    private void logOutboundMsg(SOAPMessageContext smc){
-    	SOAPMessage message = smc.getMessage();
-    	SOAPBody sb;
-		try {
-			sb = message.getSOAPBody();
-			
-			
-			@SuppressWarnings("rawtypes")
-			Iterator it = sb.getChildElements();
-			while(it.hasNext()){
-				 Node node=(Node)it.next();
-				 Element ele=(Element)node;
-				 System.out.println(ele.getLocalName());
-				 if(ele.getTextContent().length() != 0);
-				 	System.out.println(ele.getTextContent());
-			}
-		} catch (SOAPException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
-    
-    private Certificate getTransporterCertificateFromContext(MessageContext map, String name){
-    	System.out.println("NAME");
-    	System.out.println(name);
-    	String tName = name;
-        java.util.Iterator it = map.keySet().iterator();
-        while (it.hasNext()) {
-            Object key = it.next();
-            if(tName.equals("UpaTransporter1")){
-            	if(key.toString().equals(TRANSPORTER1_CERTICATE_PROPERTY)){
-            		Object value = map.get(key);
-	            	return (Certificate) value;
-            	}
-            }
-            else if(tName.equals("UpaTransporter2")){
-            	if(key.toString().equals(TRANSPORTER2_CERTIFICATE_PROPERTY)){
-           			Object value = map.get(key);
-	            	return (Certificate) value;
-           		}
-            }
-        }
-		return null;
-    }
-    
-    private String getTransporterNameFromContext(MessageContext map){
-    	java.util.Iterator it = map.keySet().iterator();
-        while (it.hasNext()) {
-            Object key = it.next();
-            System.out.println(key.toString() + " " + map.get(key).toString());
-            if(key.toString().equals(TRANSPORTER_NAME_PROPERTY)){
-            	Object value = map.get(key);
-            	return value.toString();
-            }
-        }
-		return null;
-    }
-
 }

@@ -1,6 +1,15 @@
 package pt.upa.transporter;
 
+import pt.upa.handlers.BrokerHandler;
 import pt.upa.naming.EndpointManager;
+
+import static javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY;
+
+import java.util.Map;
+
+import javax.xml.ws.BindingProvider;
+
+import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.upa.transporter.ws.TransporterPort;
 
 public class TransporterApplication {
@@ -33,6 +42,7 @@ public class TransporterApplication {
 			endpoint.setVerbose(true);
 			port = new TransporterPort(wsName);
 			endpoint.setPort(port);
+			
 		}
 
 		try {

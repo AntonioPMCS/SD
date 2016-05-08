@@ -8,6 +8,12 @@ import java.util.Timer;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.jws.WebService;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
+
+import pt.upa.handlers.TransporterHandler;
+
+import javax.annotation.Resource;
 import javax.jws.HandlerChain;
 
 
@@ -33,9 +39,11 @@ public class TransporterPort implements TransporterPortType{
 	private Timer timer = new Timer();
 	private static int id = 0;
 	private ArrayList<JobView> jobs = new ArrayList<JobView>();
+	private Certificate brokerCert = null;
+	private MessageContext messageContext = null;
 	
-	public static Certificate brokerCert = null;
-	
+	@Resource
+	private WebServiceContext webServiceContext;
 	
 	
 	public TransporterPort(String name){
@@ -49,12 +57,13 @@ public class TransporterPort implements TransporterPortType{
 
 	@Override
 	public String ping(String message) {
+		updateMsgContext();
 		return name+" responding to ping request...Message given: "+message;
 	}
 
 	@Override
 	public JobView requestJob(String origin, String destination, int price) throws BadLocationFault_Exception, BadPriceFault_Exception {
-		
+		updateMsgContext();
 		//Check if price is negative
 		//TODO: Verify BadPriceFault constructor
 		if(price < 0){
@@ -104,6 +113,7 @@ public class TransporterPort implements TransporterPortType{
 	 *         to decide on an already decided job.*/
 	@Override
 	public JobView decideJob(String id, boolean accept) throws BadJobFault_Exception {
+		updateMsgContext();
 		if(jobStatus(id) != null){
 			
 			JobStateView current = jobStatus(id).getJobState();
@@ -133,6 +143,7 @@ public class TransporterPort implements TransporterPortType{
 
 	@Override
 	public JobView jobStatus(String id) {
+		updateMsgContext();
 		for(JobView job : jobs){
 			if(job.getJobIdentifier().equals(id)){
 				return job;
@@ -143,11 +154,13 @@ public class TransporterPort implements TransporterPortType{
 
 	@Override
 	public List<JobView> listJobs() {
+		updateMsgContext();
 		return jobs;
 	}
 
 	@Override
 	public void clearJobs() {
+		updateMsgContext();
 		timer.cancel();
 		timer.purge();
 		id = 0;
@@ -231,5 +244,14 @@ public class TransporterPort implements TransporterPortType{
 		job.setJobPrice(price);
 		job.setJobState(JobStateView.PROPOSED);
 		return job;
+	}
+	
+	/*
+	 * Gets and sets content on messages received from brokers
+	 */
+	public void updateMsgContext(){
+		//Nome da Transportadora
+		messageContext = webServiceContext.getMessageContext();
+		messageContext.put(TransporterHandler.TRANSPORTER_NAME_PROPERTY, name);
 	}
 }

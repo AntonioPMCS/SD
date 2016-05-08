@@ -43,7 +43,9 @@ public class BrokerApplication {
 			
 			endpoint.start();
 			((BrokerPort) endpoint.getPort()).lookUpTransporterServices();
-			((BrokerPort) endpoint.getPort()).ping("hello");
+			System.out.println(((BrokerPort) endpoint.getPort()).ping("hello"));
+			System.out.println(((BrokerPort) endpoint.getPort()).ping("hello"));
+			System.out.println(((BrokerPort) endpoint.getPort()).ping("hello"));
 			endpoint.awaitConnections();
 			
 		} finally {

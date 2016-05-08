@@ -13,12 +13,9 @@ import javax.jws.WebService;
 
 @WebService(endpointInterface = "pt.upa.ca.ws.Authority")
 public class AuthorityImpl implements Authority{
-	private String name = "CertificateAuthority";
-	private final String BROKER_CERTIFICATE_ALIAS = "UpaBroker";
 	private Certificate brokerCert;
 	private Certificate transporter1Cert;
 	private Certificate transporter2Cert;
-	private KeyStore keystore;
 	
 	public AuthorityImpl(){
 		CertificateFactory fact;
@@ -63,10 +60,11 @@ public class AuthorityImpl implements Authority{
 	@Override
 	public byte[] getTransporterCertificate(int nr) {
 		try{
-			switch(nr){
-				case 1 : return transporter1Cert.getEncoded();
-				case 2 : return transporter2Cert.getEncoded();
-			}
+			if(nr == 1)
+				return transporter1Cert.getEncoded();
+			else if(nr == 2)
+				return transporter2Cert.getEncoded();
+			
 		} catch (CertificateEncodingException e) {
 			e.printStackTrace();
 		}
