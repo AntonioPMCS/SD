@@ -105,12 +105,12 @@ public class TransporterClient implements TransporterPortType{
 		service = new TransporterService();
 		port = service.getTransporterPort();
 
-		BindingProvider bindingProvider = (BindingProvider) port;
-		Map<String, Object> requestContext = bindingProvider.getRequestContext();
+		
 		if (wsURL != null) {
 			if (verbose)
 				System.out.println("Setting endpoint address ...");
-			
+			BindingProvider bindingProvider = (BindingProvider) port;
+			Map<String, Object> requestContext = bindingProvider.getRequestContext();
 			requestContext.put(ENDPOINT_ADDRESS_PROPERTY, wsURL);
 			
 		}
