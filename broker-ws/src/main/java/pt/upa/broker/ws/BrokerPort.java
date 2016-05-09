@@ -45,6 +45,8 @@ public class BrokerPort implements BrokerPortType{
 	private BrokerClient secondaryBroker = null;
 	private static final int FIVE_SECONDS = 5000;
 	private Timer pingBroker = new Timer();
+	private boolean goPrimary = true;
+	
 	
 	//Secondary constructor
 	public BrokerPort(String name, EndpointManager endpointManager) throws JAXRException{
@@ -52,7 +54,28 @@ public class BrokerPort implements BrokerPortType{
 		this.endpointManager = endpointManager;
 		principal = false;
 		
-		
+		//Sets thread launching on timer
+				pingBroker = new Timer();
+				pingBroker.scheduleAtFixedRate(new TimerTask(){
+				      					public void run() { checkGoPrimary();}},
+												FIVE_SECONDS, FIVE_SECONDS);
+	}
+	
+	//if goPrimary true launches method do go primary server
+	//if not puts goPrimary true, in the meanwhile
+	//it is expected the primary broker to put this goPrimary false when he makes the ping.
+	public void checkGoPrimary(){
+		if(goPrimary)
+			goPrimary();
+		else
+			goPrimary = true;
+	}
+	
+	/*
+	 * Method to put secondary UpaBroker in primary mode
+	 */
+	public void goPrimary(){
+		//TODO: bora bora antónio!!
 	}
 	
 	//Primary constructor
@@ -83,18 +106,14 @@ public class BrokerPort implements BrokerPortType{
 		return comeBack;
 	}
 	
-	
+	//TODO: put this method running assynchronously
 	@Override
 	public void updateBroker(List<TransportView> transports) {
-		if(principal){
-			if(transports == null){
-				secondaryBroker.updateBroker(null);
-				System.out.println("Hello my name is "+name+" and I received this msg");
-			}
-		}
-		else{
-			this.transports = transports;
-			System.out.println("aqui!");
+		if(!principal){
+			if(!(transports == null))
+				this.transports = transports;
+			System.out.println("Secondary UpaBroker received message from primary UpaBroker");
+			goPrimary = false;
 		}
 	}
 	
