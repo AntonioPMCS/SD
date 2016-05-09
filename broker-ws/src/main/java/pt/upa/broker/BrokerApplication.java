@@ -18,10 +18,12 @@ public class BrokerApplication {
 		String uddiURL = null;
 		String wsName = null;
 		String wsURL = null;
-
+		String otherBrokerWsUrl = null;
+		
 		// Create server implementation object, according to options
 		EndpointManager endpoint = null;
 		BrokerPort port = null;
+		boolean principal = false;
 		if (args.length == 1) {
 			wsURL = args[0];
 			endpoint = new EndpointManager(wsURL);
@@ -33,19 +35,27 @@ public class BrokerApplication {
 			wsURL = args[2];
 			endpoint = new EndpointManager(uddiURL, wsName, wsURL);
 			endpoint.setVerbose(true);
-			port = new BrokerPort(wsName, endpoint);
+			if(wsURL.equals("http://localhost:8080/broker-ws/endpoint")){
+				System.out.println(args[3]);
+				port = new BrokerPort(wsName, endpoint, args[3]);
+				principal = true;
+			}
+			else
+				port = new BrokerPort(wsName, endpoint);
 			endpoint.setPort(port);
-			
-			
 		}
 
 		try {
 			
 			endpoint.start();
 			((BrokerPort) endpoint.getPort()).lookUpTransporterServices();
+			/*
 			System.out.println(((BrokerPort) endpoint.getPort()).ping("hello"));
 			System.out.println(((BrokerPort) endpoint.getPort()).ping("hello"));
 			System.out.println(((BrokerPort) endpoint.getPort()).ping("hello"));
+			*/
+			if(principal)
+				((BrokerPort) endpoint.getPort()).updateBroker(null);
 			endpoint.awaitConnections();
 			
 		} finally {

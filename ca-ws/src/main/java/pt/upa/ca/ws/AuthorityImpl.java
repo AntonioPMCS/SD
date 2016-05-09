@@ -2,6 +2,7 @@ package pt.upa.ca.ws;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
@@ -27,18 +28,22 @@ public class AuthorityImpl implements Authority{
 			FileInputStream is = new FileInputStream ("./CASecurity/UpaBroker.cer");
 			brokerCert = fact.generateCertificate(is);
 			
-			System.out.println("Obtaining transporter1 certificate...");
-			//Get Transporter1 Certificate
-			is = new FileInputStream ("./CASecurity/UpaTransporter1.cer");
-			transporter1Cert = fact.generateCertificate(is);
 			
-			System.out.println("Obtaining transporter2 certificate...");
+			//Get Transporter1 Certificate
+			System.out.println("Obtaining transporter1 certificate...");
+			FileInputStream es = new FileInputStream ("./CASecurity/UpaTransporter1.cer");
+			transporter1Cert = fact.generateCertificate(es);
+			
 			//Get Transporter2 Certificate
-			is = new FileInputStream ("./CASecurity/UpaTransporter2.cer");
-			transporter2Cert = fact.generateCertificate(is);
+			System.out.println("Obtaining transporter2 certificate...");
+			FileInputStream sd = new FileInputStream ("./CASecurity/UpaTransporter2.cer");
+			transporter2Cert = fact.generateCertificate(sd);
 		} catch (CertificateException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

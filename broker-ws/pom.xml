@@ -23,8 +23,11 @@
 
         <mainclass>pt.upa.broker.BrokerApplication</mainclass>
 
-        <ws.url>http://localhost:8088/broker-ws/endpoint</ws.url>
-
+		<!-- instance number - redefine using -D option - e.g. mvn -Dws.i=1 exec:java -->
+        <ws.i>0</ws.i>
+        
+        <ws.url>http://localhost:808${ws.i}/broker-ws/endpoint</ws.url>
+		<ws.url2>http://localhost:8081/broker-ws/endpoint</ws.url2>
         <ws.name>UpaBroker</ws.name>
         <uddi.url>http://localhost:9090</uddi.url>
     </properties>
@@ -66,6 +69,11 @@
 		<dependency>
 			<groupId>pt.upa.49</groupId>
 			<artifactId>uddi-naming</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>pt.upa.a49</groupId>
+			<artifactId>broker-ws-cli</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
     </dependencies>
@@ -133,6 +141,7 @@
                         <argument>${uddi.url}</argument>
                         <argument>${ws.name}</argument>
                         <argument>${ws.url}</argument>
+                        <argument>${ws.url2}</argument>
                     </arguments>
                 </configuration>
             </plugin>

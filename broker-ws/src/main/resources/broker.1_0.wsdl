@@ -118,7 +118,20 @@
             </xs:complexType>
             <xs:element name="clearTransportsResponse" type="tns:clearTransportsResponse" />
         
+        	<!-- New operation updateBroker -->
+        	<xs:complexType name="updateBroker">
+        		<xs:sequence >
+        			<xs:element name="transports" type="tns:transportView" minOccurs="0" maxOccurs="unbounded" />
+        		</xs:sequence>
+            </xs:complexType>
+            <xs:element name="updateBroker" type="tns:updateBroker" />
         
+            <xs:complexType name="updateBrokerResponse">
+                <xs:sequence />
+            </xs:complexType>
+            <xs:element name="updateBrokerResponse" type="tns:updateBrokerResponse" />
+            
+            
             <xs:complexType name="UnknownLocationFault">
                 <xs:sequence>
                     <xs:element name="location" type="xs:string" minOccurs="0" />
@@ -193,7 +206,15 @@
     <message name="clearTransportsResponse">
         <part name="parameters" element="tns:clearTransportsResponse" />
     </message>
-
+    
+    <!-- New operation updateBroker -->
+	<message name="updateBroker">
+        <part name="parameters" element="tns:updateBroker" />
+    </message>
+    <message name="updateBrokerResponse">
+        <part name="parameters" element="tns:updateBrokerResponse" />
+    </message>
+    
     <message name="UnknownLocationFault">
         <part name="fault" element="tns:UnknownLocationFault" />
     </message>
@@ -266,6 +287,16 @@
                 wsam:Action="http://ws.broker.upa.pt/BrokerPort/clearTransportsResponse"
                 message="tns:clearTransportsResponse" />
         </operation>
+        
+        <!-- New operation updateBroker -->
+        <operation name="updateBroker">
+            <input
+                wsam:Action="http://ws.broker.upa.pt/BrokerPort/updateBrokerRequest"
+                message="tns:updateBroker" />
+            <output
+                wsam:Action="http://ws.broker.upa.pt/BrokerPort/updateBrokerResponse"
+                message="tns:updateBrokerResponse" />
+        </operation>
     </portType>
 
     <!-- SOAP/HTTP Binding -->
@@ -332,6 +363,17 @@
 
         <operation name="clearTransports">
             <soap:operation soapAction="" />
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+        </operation>
+        
+        <!-- New operation updateBroker -->
+        <operation name="updateBroker">
+        	<soap:operation soapAction="" />
             <input>
                 <soap:body use="literal" />
             </input>

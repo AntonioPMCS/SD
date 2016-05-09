@@ -8,6 +8,8 @@ import javax.xml.ws.Response;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDIRecord;
+import pt.upa.broker.ws.cli.BrokerClient;
+import pt.upa.broker.ws.cli.BrokerClientException;
 import pt.upa.naming.EndpointManager;
 import pt.upa.transporter.ws.BadJobFault_Exception;
 import pt.upa.transporter.ws.BadLocationFault_Exception;
@@ -19,7 +21,10 @@ import pt.upa.transporter.ws.cli.TransporterClientException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadLocalRandom;
 
 @WebService(
     endpointInterface="pt.upa.broker.ws.BrokerPortType",
@@ -35,13 +40,39 @@ public class BrokerPort implements BrokerPortType{
 	private List<TransportView> transports = new ArrayList<TransportView>();
 	private EndpointManager endpointManager;
 	private ArrayList<TransporterClient> transporterClients = new ArrayList<TransporterClient>();
+	private boolean principal = false;
+	private String secondBrokerUrl = null;
+	private BrokerClient secondaryBroker = null;
+	private static final int FIVE_SECONDS = 5000;
+	private Timer pingBroker = new Timer();
 	
-	public ArrayList<TransporterClient> getTransporters(){
-		return transporterClients;
-	}
+	//Secondary constructor
 	public BrokerPort(String name, EndpointManager endpointManager) throws JAXRException{
 		this.name=name;
 		this.endpointManager = endpointManager;
+		principal = false;
+		
+		
+	}
+	
+	//Primary constructor
+	public BrokerPort(String name, EndpointManager endpointManager, String url) throws JAXRException{
+		this.name=name;
+		this.endpointManager = endpointManager;
+		principal = true;
+		secondBrokerUrl = url;
+		
+		try {
+			secondaryBroker = new BrokerClient(url);
+		} catch (BrokerClientException e) {
+			e.printStackTrace();
+		}
+		
+		//Sets thread launching on timer
+		pingBroker = new Timer();
+		pingBroker.scheduleAtFixedRate(new TimerTask(){
+		      					public void run() { secondaryBroker.updateBroker(null);}},
+										FIVE_SECONDS, FIVE_SECONDS);
 	}
 	
 	public String ping (String word) {
@@ -50,6 +81,25 @@ public class BrokerPort implements BrokerPortType{
 			comeBack+= transporter.ping(word) + '\n';
 		}
 		return comeBack;
+	}
+	
+	
+	@Override
+	public void updateBroker(List<TransportView> transports) {
+		if(principal){
+			if(transports == null){
+				secondaryBroker.updateBroker(null);
+				System.out.println("Hello my name is "+name+" and I received this msg");
+			}
+		}
+		else{
+			this.transports = transports;
+			System.out.println("aqui!");
+		}
+	}
+	
+	public ArrayList<TransporterClient> getTransporters(){
+		return transporterClients;
 	}
 
 	public String requestTransport (String origin, String destination, int price)
@@ -139,7 +189,8 @@ public class BrokerPort implements BrokerPortType{
 		}catch(BadJobFault_Exception e){
 			throw new UnavailableTransportFault_Exception("ERROR: Transporter Service doesn't know a given transport ID "+e.getMessage(), new UnavailableTransportFault());
 		} 
-	
+		
+		secondaryBroker.updateBroker(transports);
 		return chosenRequest.getId();
 	}
 
@@ -169,6 +220,7 @@ public class BrokerPort implements BrokerPortType{
 
 	public void clearTransports() {
 		transports.clear();
+		secondaryBroker.updateBroker(transports);
 	}
 	
 	/**

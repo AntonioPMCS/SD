@@ -1,7 +1,5 @@
 package pt.upa.ca.ws;
 
-import java.security.cert.Certificate;
-
 import javax.jws.WebService;
 
 @WebService

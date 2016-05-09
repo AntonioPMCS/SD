@@ -189,7 +189,7 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
 				tCert = tCert2;
 			
 			PublicKey tPubKey = tCert.getPublicKey();
-	    	
+	    	System.out.println(tPubKey);
 			//Certificado do CA
 			String keystoreFilename = "./UpaBrokerSecurity/UpaBroker.jks";
     	    FileInputStream fIn = new FileInputStream(keystoreFilename);

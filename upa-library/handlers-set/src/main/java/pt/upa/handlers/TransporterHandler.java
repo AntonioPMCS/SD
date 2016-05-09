@@ -1,6 +1,7 @@
 package pt.upa.handlers;
 
 import java.io.ByteArrayInputStream;
+import static javax.xml.bind.DatatypeConverter.printHexBinary;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -106,6 +107,7 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
             else if(tName.equals("UpaTransporter2"))
             	keystoreFilename = "./TransporterSecurity/UpaTransporter2.jks";
             
+            
     	    FileInputStream fIn = new FileInputStream(keystoreFilename);
     	    KeyStore keystore = KeyStore.getInstance("JKS");
     	    keystore.load(fIn,TRANSPORTER_STORE_PASS.toCharArray());
@@ -122,11 +124,25 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 			Digest digestor = new Digest();
 			byte[] digestedMsg = digestor.digestMessage(convertedSoap);
 			
-			//Get Private Key from Broker Certificate
+			//Get Private Key from Transporter Certificate
 			PrivateKey pk = (PrivateKey) keystore.getKey(tName, TRANSPORTER_KEY_PASS.toCharArray());
 			
-			//Cipher nounce and msg
+			/*-----TESTE*/
 			Cypher cypher = new Cypher();
+			System.out.println(printHexBinary(random));
+			System.out.println("Asked "+tName+" certificate to CA.");
+			byte[] brokerCertByteArray = authority.getTransporterCertificate(2);
+			CertificateFactory cf   = CertificateFactory.getInstance("X.509");
+			Certificate tCert2 = cf.generateCertificate(new ByteArrayInputStream(brokerCertByteArray));
+			PublicKey publicKey = tCert2.getPublicKey();
+			byte[] teste = cypher.cypherWithPrivateKey(random, pk);
+			byte[] teste2=	cypher.decipherWithPublicKey(teste, publicKey);
+			System.out.println(printHexBinary(teste2));
+			//////////////
+			
+			
+			//Cipher nounce and msg
+			//Cypher cypher = new Cypher();
 			byte[] cipheredRandom = cypher.cypherWithPrivateKey(random, pk);
 			byte[] cipheredDigestMsg = cypher.cypherWithPrivateKey(digestedMsg, pk);
 			

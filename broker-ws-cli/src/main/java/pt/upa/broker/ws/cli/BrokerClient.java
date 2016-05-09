@@ -21,11 +21,13 @@ import java.util.Map;
 import javax.xml.ws.BindingProvider;
 
 public class BrokerClient implements BrokerPortType{
-
+	private UDDINaming uddiNaming = null;
+	private boolean toBroker = false;
 	/** constructor with provided web service URL */
 	public BrokerClient(String wsURL) throws BrokerClientException {
 		this.wsURL = wsURL;
 		createStub();
+		toBroker = true;
 	}
 
 	/** constructor with provided UDDI location and name */
@@ -34,15 +36,21 @@ public class BrokerClient implements BrokerPortType{
 		this.wsName = wsName;
 		uddiLookup();
 		createStub();
+		toBroker = false;
 		setTransporterContext();
 	}
+	
+	public UDDINaming getUDDINaming(){
+		return uddiNaming;
+	}
+	
 
 	/** UDDI lookup */
 	private void uddiLookup() throws BrokerClientException {
 		try {
 			if (verbose)
 				System.out.printf("Contacting UDDI at %s%n", uddiURL);
-			UDDINaming uddiNaming = new UDDINaming(uddiURL);
+			uddiNaming = new UDDINaming(uddiURL);
 
 			if (verbose)
 				System.out.printf("Looking for '%s'%n", wsName);
@@ -72,38 +80,7 @@ public class BrokerClient implements BrokerPortType{
 			BindingProvider bindingProvider = (BindingProvider) port;
 			Map<String, Object> requestContext = bindingProvider.getRequestContext();
 			requestContext.put(ENDPOINT_ADDRESS_PROPERTY, wsURL);
-			
-			setTimeouts(requestContext);
 		}
-	}
-	
-	private void setTimeouts(Map<String, Object> requestContext){
-		
-		/*
-		int connectionTimeout = 1000;
-        // The connection timeout property has different names in different versions of JAX-WS
-        // Set them all to avoid compatibility issues
-        final List<String> CONN_TIME_PROPS = new ArrayList<String>();
-        CONN_TIME_PROPS.add("com.sun.xml.ws.connect.timeout");
-        CONN_TIME_PROPS.add("com.sun.xml.internal.ws.connect.timeout");
-        CONN_TIME_PROPS.add("javax.xml.ws.client.connectionTimeout");
-        // Set timeout until a connection is established (unit is milliseconds; 0 means infinite)
-        for (String propName : CONN_TIME_PROPS)
-            requestContext.put(propName, connectionTimeout);
-        System.out.printf("Set connection timeout to %d milliseconds%n", connectionTimeout);
-
-        int receiveTimeout = 2000;
-        // The receive timeout property has alternative names
-        // Again, set them all to avoid compability issues
-        final List<String> RECV_TIME_PROPS = new ArrayList<String>();
-        RECV_TIME_PROPS.add("com.sun.xml.ws.request.timeout");
-        RECV_TIME_PROPS.add("com.sun.xml.internal.ws.request.timeout");
-        RECV_TIME_PROPS.add("javax.xml.ws.client.receiveTimeout");
-        // Set timeout until the response is received (unit is milliseconds; 0 means infinite)
-        for (String propName : RECV_TIME_PROPS)
-            requestContext.put(propName, 1000);
-        System.out.printf("Set receive timeout to %d milliseconds%n", receiveTimeout);
-        */
 	}
 
 	/** WS service */
@@ -125,6 +102,10 @@ public class BrokerClient implements BrokerPortType{
 		return wsURL;
 	}
 
+	public BrokerPortType getPort(){
+		return port;
+	}
+	
 	public String ping(String name) {
 		return port.ping(name);
 	
@@ -146,6 +127,11 @@ public class BrokerClient implements BrokerPortType{
 	public void clearTransports() {
 		port.clearTransports();
 	}
+	
+	@Override
+	public void updateBroker(List<TransportView> transports) {
+		port.updateBroker(transports);
+	}
 
 
 	/** output option **/
@@ -162,8 +148,11 @@ public class BrokerClient implements BrokerPortType{
 	public void setTransporterContext(){
 		BindingProvider bindingProvider = (BindingProvider) port;
 		Map<String, Object> requestContext = bindingProvider.getRequestContext();
-		requestContext.put(TransporterHandler.TRANSPORTER_NAME_PROPERTY, wsName);
+		
+		if(toBroker){//Hás de voltar aqui
+			//requestContext.put(TransporterHandler.TRANSPORTER_NAME_PROPERTY, wsName);
+		}
+		else
+			requestContext.put(TransporterHandler.TRANSPORTER_NAME_PROPERTY, wsName);
 	}
-
-
 }
