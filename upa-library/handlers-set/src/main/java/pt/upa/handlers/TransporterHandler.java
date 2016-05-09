@@ -61,6 +61,10 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
     }
 
     public boolean handleMessage(SOAPMessageContext smc) {
+    	String tName = (String) smc.get(TRANSPORTER_NAME_PROPERTY);
+    	if(tName.equals("UpaBroker"))
+    		return true;
+    		
     	System.out.println("#------------------------------------------------------------------------#");
     	Boolean outbound = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
     	try {

@@ -6,12 +6,10 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.WebServiceException;
 
-import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.upa.broker.ws.InvalidPriceFault_Exception;
 import pt.upa.broker.ws.UnavailableTransportFault_Exception;
 import pt.upa.broker.ws.UnavailableTransportPriceFault_Exception;
@@ -32,7 +30,6 @@ public class BrokerClientApplication {
 	private static final String HELP = "type 'help' to review the commands";
 	private static final long TIME_TO_WAIT = 1000;
 	public static void showCommands(){
-		
 		System.out.println(REQUEST);
 		System.out.println(VIEW);
 		System.out.println(HELP);

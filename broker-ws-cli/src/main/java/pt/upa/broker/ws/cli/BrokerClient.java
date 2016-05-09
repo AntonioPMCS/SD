@@ -150,7 +150,7 @@ public class BrokerClient implements BrokerPortType{
 		Map<String, Object> requestContext = bindingProvider.getRequestContext();
 		
 		if(toBroker){//Hás de voltar aqui
-			//requestContext.put(TransporterHandler.TRANSPORTER_NAME_PROPERTY, wsName);
+			requestContext.put(TransporterHandler.TRANSPORTER_NAME_PROPERTY, "UpaBroker");
 		}
 		else
 			requestContext.put(TransporterHandler.TRANSPORTER_NAME_PROPERTY, wsName);
