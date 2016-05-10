@@ -61,7 +61,7 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
     }
 
     public boolean handleMessage(SOAPMessageContext smc) {
-    	String tName = (String) smc.get(TRANSPORTER_NAME_PROPERTY);
+    	System.out.println("#-----------------------------------------------#");
     		
     	Boolean outbound = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
     	try {
@@ -73,11 +73,11 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
     	if (outbound) {
     		System.out.println("->Handling outgoing message");
             //logOperationType(smc);
-           // handleOutgoingMsg(smc);
+            handleOutgoingMsg(smc);
         } else {
         	System.out.println("->Handling incoming message");
             //logOperationType(smc);
-            //handleIncomingMsg(smc);
+            handleIncomingMsg(smc);
         }
     	
         return true;
@@ -108,7 +108,6 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
             else if(tName.equals("UpaTransporter2"))
             	keystoreFilename = "./TransporterSecurity/UpaTransporter2.jks";
             
-            
     	    FileInputStream fIn = new FileInputStream(keystoreFilename);
     	    KeyStore keystore = KeyStore.getInstance("JKS");
     	    keystore.load(fIn,TRANSPORTER_STORE_PASS.toCharArray());
@@ -128,20 +127,9 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 			//Get Private Key from Transporter Certificate
 			PrivateKey pk = (PrivateKey) keystore.getKey(tName, TRANSPORTER_KEY_PASS.toCharArray());
 			
-			/*-----TESTE*/
+			
+			
 			Cypher cypher = new Cypher();
-			System.out.println(printHexBinary(random));
-			System.out.println("Asked "+tName+" certificate to CA.");
-			byte[] brokerCertByteArray = authority.getTransporterCertificate(2);
-			CertificateFactory cf   = CertificateFactory.getInstance("X.509");
-			Certificate tCert2 = cf.generateCertificate(new ByteArrayInputStream(brokerCertByteArray));
-			PublicKey publicKey = tCert2.getPublicKey();
-			byte[] teste = cypher.cypherWithPrivateKey(random, pk);
-			byte[] teste2=	cypher.decipherWithPublicKey(teste, publicKey);
-			System.out.println(printHexBinary(teste2));
-			//////////////
-			
-			
 			//Cipher nounce and msg
 			//Cypher cypher = new Cypher();
 			byte[] cipheredRandom = cypher.cypherWithPrivateKey(random, pk);
@@ -207,7 +195,6 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 			//Get TransporterName
 			String tName = headerElements.get("TransporterName");
 			
-			
 			//Get Broker Certificate
 			if(brokerCert == null){
 				System.out.println("Asked UpaBroker certificate to CA.");
@@ -228,6 +215,9 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 				keystoreFilename = "./TransporterSecurity/UpaTransporter2.jks";
 			}
 				
+			System.out.println("Keystore filename");
+			System.out.println(keystoreFilename);
+			
     	    FileInputStream fIn = new FileInputStream(keystoreFilename);
     	    KeyStore keystore = KeyStore.getInstance("JKS");
     	    keystore.load(fIn, TRANSPORTER_STORE_PASS.toCharArray());

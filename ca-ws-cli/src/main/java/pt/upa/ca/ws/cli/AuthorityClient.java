@@ -116,7 +116,7 @@ public class AuthorityClient implements Authority {
 
 	@Override
 	public byte[] getTransporterCertificate(int arg0) {
-		return port.getTransporterCertificate(1);
+		return port.getTransporterCertificate(arg0);
 	}
 
 	@Override

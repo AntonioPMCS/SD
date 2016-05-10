@@ -51,6 +51,7 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
     }
 
     public boolean handleMessage(SOAPMessageContext smc) {
+    	System.out.println("#-----------------------------------------------#");
     	Boolean outbound = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
     	
     	try {
@@ -60,10 +61,10 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
 		}
     	if (outbound) {
     		System.out.println("->Handling outgoing message");
-           // handleOutgoingMsg(smc);
+            handleOutgoingMsg(smc);
         } else {
         	System.out.println("->Handling incoming message");
-           // handleIncomingMsg(smc);
+            handleIncomingMsg(smc);
         }
     	
         return true;
@@ -168,8 +169,7 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
 			
 			//Get TransporterName
 			String tName = headerElements.get("TransporterName");
-			System.out.println("NOME");
-			System.out.println(tName);
+			
 			//Get Transporter Certificate from context
 			if(tName.equals("UpaTransporter1") && tCert1 == null){
 				System.out.println("Asked "+tName+" certificate to CA.");
@@ -185,10 +185,14 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
 			}
 			
 			Certificate tCert = null;
-			if(tName.equals("UpaTransporter1"))
+			if(tName.equals("UpaTransporter1")){
 				tCert = tCert1;
-			else if(tName.equals("UpaTransporter2"))
+			}
+				
+			else if(tName.equals("UpaTransporter2")){
 				tCert = tCert2;
+			}
+				
 			
 			PublicKey tPubKey = tCert.getPublicKey();
 	    	System.out.println(tPubKey);

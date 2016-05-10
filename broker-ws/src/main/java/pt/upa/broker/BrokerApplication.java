@@ -37,8 +37,9 @@ public class BrokerApplication {
 			if(wsURL.equals("http://localhost:8080/broker-ws/endpoint")){
 				endpoint = new EndpointManager(uddiURL, wsName, wsURL);
 				endpoint.setVerbose(true);
-				System.out.println(args[3]);
-				port = new BrokerPort(wsName, endpoint, args[3]);
+				//TODO: descomentar o de baixo e apagar o outro logo aseguir
+				//port = new BrokerPort(wsName, endpoint, args[3]);
+				port = new BrokerPort(wsName, endpoint);
 				principal = true;
 			}
 			else{

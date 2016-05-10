@@ -251,7 +251,9 @@ public class TransporterPort implements TransporterPortType{
 	 */
 	public void updateMsgContext(){
 		//Nome da Transportadora
-		messageContext = webServiceContext.getMessageContext();
-		messageContext.put(TransporterHandler.TRANSPORTER_NAME_PROPERTY, name);
+		if(webServiceContext != null){
+			messageContext = webServiceContext.getMessageContext();
+			messageContext.put(TransporterHandler.TRANSPORTER_NAME_PROPERTY, name);
+		}
 	}
 }
