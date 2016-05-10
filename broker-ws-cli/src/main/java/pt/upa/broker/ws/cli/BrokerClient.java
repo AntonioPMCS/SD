@@ -171,7 +171,7 @@ public class BrokerClient implements BrokerPortType{
         	
         	//There is only on service left with same name
         	try {
-        		uddiNaming.unbind(wsURL);
+        		uddiNaming.unbind(wsName);
 				wsURL = uddiNaming.lookup(wsName);
 				System.out.println("Creating stub ...");
 				service = new BrokerService();
