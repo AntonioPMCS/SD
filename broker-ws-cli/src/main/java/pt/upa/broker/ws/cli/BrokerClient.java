@@ -139,7 +139,7 @@ public class BrokerClient implements BrokerPortType{
 		BindingProvider bindingProvider = (BindingProvider) port;
 		Map<String, Object> requestContext = bindingProvider.getRequestContext();
 
-        int connectionTimeout = 1000;
+        int connectionTimeout = 2000;
         // The connection timeout property has different names in different versions of JAX-WS
         // Set them all to avoid compatibility issues
         final List<String> CONN_TIME_PROPS = new ArrayList<String>();
@@ -151,7 +151,7 @@ public class BrokerClient implements BrokerPortType{
             requestContext.put(propName, connectionTimeout);
         System.out.printf("Set connection timeout to %d milliseconds%n", connectionTimeout);
 
-        int receiveTimeout = 2000;
+        int receiveTimeout = 4000;
         // The receive timeout property has alternative names
         // Again, set them all to avoid compability issues
         final List<String> RECV_TIME_PROPS = new ArrayList<String>();
@@ -171,8 +171,8 @@ public class BrokerClient implements BrokerPortType{
         	
         	//There is only on service left with same name
         	try {
-        		uddiNaming.unbind(wsName);
-				wsURL = uddiNaming.lookup(wsName);
+        		
+				wsURL = uddiNaming.lookup("UpaBroker2");
 				System.out.println("Creating stub ...");
 				service = new BrokerService();
 				port = service.getBrokerPort();

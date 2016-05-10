@@ -77,12 +77,7 @@ public class BrokerPort implements BrokerPortType{
 	//================================== Fault tolerance methods
 	@Override
 	public void updateBroker(TransportView transports) {
-		//Add operation
-		if(transports != null)
-			this.transports.add(transports);
-		//Clear operation
-		else
-			this.transports.clear();
+		this.transports.add(transports);
 	}
 
 	@Override

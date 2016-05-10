@@ -33,25 +33,29 @@ public class BrokerApplication {
 			uddiURL = args[0];
 			wsName = args[1];
 			wsURL = args[2];
-			endpoint = new EndpointManager(uddiURL, wsName, wsURL);
-			endpoint.setVerbose(true);
+			
 			if(wsURL.equals("http://localhost:8080/broker-ws/endpoint")){
+				endpoint = new EndpointManager(uddiURL, wsName, wsURL);
+				endpoint.setVerbose(true);
 				System.out.println(args[3]);
 				port = new BrokerPort(wsName, endpoint, args[3]);
 				principal = true;
 			}
-			else
-				port = new BrokerPort(wsName, endpoint);
+			else{
+				endpoint = new EndpointManager(uddiURL, "UpaBroker2", wsURL);
+				endpoint.setVerbose(true);
+				port = new BrokerPort("UpaBroker2", endpoint);
+			}
 			endpoint.setPort(port);
 		}
 
 		try {
-			
 			endpoint.start();
 			((BrokerPort) endpoint.getPort()).lookUpTransporterServices();
-			if(principal)
-				System.out.println(((BrokerPort) endpoint.getPort()).ping("hello"));
 			endpoint.awaitConnections();
+			if(principal){
+				System.out.println(((BrokerPort) endpoint.getPort()).ping("hello"));
+			}
 			
 		} finally {
 			endpoint.stop();
