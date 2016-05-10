@@ -17,6 +17,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -55,6 +56,7 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 	private final String SCHEMA_PREFIX = "Teste";
 	public static final String  TRANSPORTER_NAME_PROPERTY = "transporterName";
 	private Certificate brokerCert;
+	private ArrayList<String> storedNounces = new ArrayList<String>();
 	
 	public Set<QName> getHeaders() {
         return null;
@@ -123,6 +125,7 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 			//Digest Message
 			Digest digestor = new Digest();
 			byte[] digestedMsg = digestor.digestMessage(convertedSoap);
+			byte[] digestedRandom = digestor.digestMessage(printBase64Binary(random));
 			
 			//Get Private Key from Transporter Certificate
 			PrivateKey pk = (PrivateKey) keystore.getKey(tName, TRANSPORTER_KEY_PASS.toCharArray());
@@ -130,9 +133,7 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 			
 			
 			Cypher cypher = new Cypher();
-			//Cipher nounce and msg
-			//Cypher cypher = new Cypher();
-			byte[] cipheredRandom = cypher.cypherWithPrivateKey(random, pk);
+			byte[] cipheredRandom = cypher.cypherWithPrivateKey(digestedRandom, pk);
 			byte[] cipheredDigestMsg = cypher.cypherWithPrivateKey(digestedMsg, pk);
 			
             //Add header
@@ -142,13 +143,16 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 
             // add header element (name, namespace prefix, namespace)
             SOAPHeaderElement transporter = sh.addHeaderElement(new QName("Broker", "TransporterName", SCHEMA_PREFIX));
+            SOAPHeaderElement cipherNounce = sh.addHeaderElement(new QName("Broker", "CipherNounce", SCHEMA_PREFIX));
             SOAPHeaderElement nounce = sh.addHeaderElement(new QName("Broker", "Nounce", SCHEMA_PREFIX));
             SOAPHeaderElement digest = sh.addHeaderElement(new QName("Broker", "Digest", SCHEMA_PREFIX));
            
             SOAPElement headerName = transporter.addChildElement("TransporterName", SCHEMA_PREFIX);
             headerName.addTextNode(tName);
-            SOAPElement headerRandom = nounce.addChildElement("CipheredRandom", SCHEMA_PREFIX);
-            headerRandom.addTextNode(printBase64Binary(cipheredRandom));
+            SOAPElement headerCipherRandom = cipherNounce.addChildElement("CipheredRandom", SCHEMA_PREFIX);
+            headerCipherRandom.addTextNode(printBase64Binary(cipheredRandom));
+            SOAPElement headerNounce =  nounce.addChildElement("Nounce", SCHEMA_PREFIX);
+            headerNounce.addTextNode(printBase64Binary(random));
             SOAPElement headerDigest = digest.addChildElement("CipheredDigest", SCHEMA_PREFIX);
             headerDigest.addTextNode(printBase64Binary(cipheredDigestMsg));
 		} catch (Exception e) {
@@ -185,6 +189,8 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 					headerElements.put(ele.getLocalName(), ele.getTextContent());
 				}
 			}
+			//Get CipheredNounce
+			String cipheredNounce = headerElements.get("CipherNounce");
 			
 			//Get Nounce
 			String nounce = headerElements.get("Nounce");
@@ -231,9 +237,9 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
     	    //Decipher nounce and digest
     	    Cypher cypher = new Cypher();
     	    byte[] digestResult = parseBase64Binary(digest);
-    	    byte[] nounceResult = parseBase64Binary(nounce);
+    	    byte[] cipherNounceResult = parseBase64Binary(cipheredNounce);
     	    byte[] decipheredDigestResult = cypher.decipherWithPublicKey(digestResult, brokerPubKey);
-    	    byte[] decipheredNounceResult = cypher.decipherWithPublicKey(nounceResult, brokerPubKey);
+    	    byte[] decipheredNounceResult = cypher.decipherWithPublicKey(cipherNounceResult, brokerPubKey);
     	    
     	    sh.removeContents();
     	    message.saveChanges();
@@ -243,12 +249,28 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 			
 			Digest digestor = new Digest();
 			byte[] digestedMsg = digestor.digestMessage(convertedSoap);
+			byte[] digestedNounce = digestor.digestMessage(nounce);
 			
 			//CHeck if they are equals
 			if(!MessageDigest.isEqual(digestedMsg, decipheredDigestResult)){
 		        SOAPFault soapFault = sb.addFault();
 		        soapFault.setFaultString("Security Error: Message was tampered.");
 		        throw new SOAPFaultException(soapFault);
+			}
+			
+			if(!MessageDigest.isEqual(digestedNounce, decipheredNounceResult)){
+				SOAPFault soapFault = sb.addFault();
+		        soapFault.setFaultString("Security Error: Message was tampered.");
+		        throw new SOAPFaultException(soapFault);
+    		}
+			else{
+				if(storedNounces.contains(digestedNounce)){
+					SOAPFault soapFault = sb.addFault();
+			        soapFault.setFaultString("Security Error: Message is repeated!.");
+			        throw new SOAPFaultException(soapFault);
+				}
+				else
+					storedNounces.add(nounce);
 			}
 			
     	}catch (Exception e){
