@@ -3,6 +3,16 @@ package pt.upa.transporter.ws;
 import org.junit.*;
 import static org.junit.Assert.*;
 
+import java.util.Properties;
+
+import javax.annotation.Resource;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
+
 import org.apache.commons.lang.NullArgumentException;
 
 /**
@@ -33,12 +43,14 @@ public class TransporterPortTest {
 	private final static int EVEN_PRICE = 20;
 	private final static int ODD_PRICE = 21;
 	private final static int NEGATIVE_PRICE = -1;
-
     // one-time initialization and clean-up
+	
+	@Resource
+    WebServiceContext ctxt;
 
     @BeforeClass
     public static void oneTimeSetUp() {
-
+    	
     }
 
     @AfterClass
@@ -58,9 +70,10 @@ public class TransporterPortTest {
     	oddPort = new TransporterPort(ODD_TRANSPORTER_NAME);
     	String[] tempList = evenPort.ping("").split(" ");
     	name = tempList[0];
-   
+    	
     }
 
+    
     @After
     public void tearDown() {
     	evenPort = null;

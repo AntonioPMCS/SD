@@ -57,7 +57,7 @@ public class TransporterClientUDDIMockTest {
     @Test
     public void testMockUddi(@Mocked final UDDINaming uddiNaming)
             throws Exception {
-
+    	
         // Preparation code not specific to JMockit, if any.
 
         // an "expectation block"

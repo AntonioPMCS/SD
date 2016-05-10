@@ -1,7 +1,6 @@
 package pt.upa.broker.ws;
 
 import javax.jws.WebService;
-import javax.jws.HandlerChain;
 import javax.xml.registry.JAXRException;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Response;
@@ -28,7 +27,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @WebService(
     endpointInterface="pt.upa.broker.ws.BrokerPortType",
-    wsdlLocation="broker.1_0.wsdl",
+    wsdlLocation="broker.1_1.wsdl",
     name="BrokerWebService",
     portName="BrokerPort",
     targetNamespace="http://ws.broker.upa.pt/",
@@ -41,11 +40,12 @@ public class BrokerPort implements BrokerPortType{
 	private EndpointManager endpointManager;
 	private ArrayList<TransporterClient> transporterClients = new ArrayList<TransporterClient>();
 	private boolean principal = false;
-	private String secondBrokerUrl = null;
 	private BrokerClient secondaryBroker = null;
 	private static final int FIVE_SECONDS = 5000;
 	private Timer pingBroker = new Timer();
-	private boolean goPrimary = true;
+	private Timer checkChange = new Timer();
+	private boolean goPrimary = false;
+	private boolean firstTime;
 	
 	
 	//Secondary constructor
@@ -53,13 +53,54 @@ public class BrokerPort implements BrokerPortType{
 		this.name=name;
 		this.endpointManager = endpointManager;
 		principal = false;
+		firstTime = true;
+	}
+	
+	//Primary constructor
+	public BrokerPort(String name, EndpointManager endpointManager, String url) throws JAXRException{
+		this.name=name;
+		this.endpointManager = endpointManager;
+		principal = true;
+		
+		try {
+			secondaryBroker = new BrokerClient(url);
+		} catch (BrokerClientException e) {
+			e.printStackTrace();
+		}
 		
 		//Sets thread launching on timer
-				pingBroker = new Timer();
-				pingBroker.scheduleAtFixedRate(new TimerTask(){
+		pingBroker.scheduleAtFixedRate(new TimerTask(){
+		      					public void run() { secondaryBroker.sendAlive();}},
+										FIVE_SECONDS, FIVE_SECONDS);
+	}
+	
+	//================================== Fault tolerance methods
+	@Override
+	public void updateBroker(TransportView transports) {
+		//Add operation
+		if(transports != null)
+			this.transports.add(transports);
+		//Clear operation
+		else
+			this.transports.clear();
+	}
+
+	@Override
+	public void sendAlive() {
+		if(!principal){
+			if(firstTime){
+				//Sets thread launching on timer
+				checkChange.scheduleAtFixedRate(new TimerTask(){
 				      					public void run() { checkGoPrimary();}},
 												FIVE_SECONDS, FIVE_SECONDS);
+			}
+			firstTime = false;
+
+			System.out.println("Secondary UpaBroker received message from primary UpaBroker");
+			goPrimary = false;
+		}
 	}
+
 	
 	//if goPrimary true launches method do go primary server
 	//if not puts goPrimary true, in the meanwhile
@@ -75,46 +116,17 @@ public class BrokerPort implements BrokerPortType{
 	 * Method to put secondary UpaBroker in primary mode
 	 */
 	public void goPrimary(){
-		//TODO: bora bora antónio!!
+		checkChange.cancel();
+		System.out.println("I just took over, i'm the primary!");
 	}
 	
-	//Primary constructor
-	public BrokerPort(String name, EndpointManager endpointManager, String url) throws JAXRException{
-		this.name=name;
-		this.endpointManager = endpointManager;
-		principal = true;
-		secondBrokerUrl = url;
-		
-		try {
-			secondaryBroker = new BrokerClient(url);
-		} catch (BrokerClientException e) {
-			e.printStackTrace();
-		}
-		
-		//Sets thread launching on timer
-		pingBroker = new Timer();
-		pingBroker.scheduleAtFixedRate(new TimerTask(){
-		      					public void run() { secondaryBroker.updateBroker(null);}},
-										FIVE_SECONDS, FIVE_SECONDS);
-	}
-	
+	//================================== Domain Methods
 	public String ping (String word) {
 		String comeBack = name + " received from the transporters: " + '\n';
 		for(TransporterClient transporter : transporterClients){
 			comeBack+= transporter.ping(word) + '\n';
 		}
 		return comeBack;
-	}
-	
-	//TODO: put this method running assynchronously
-	@Override
-	public void updateBroker(List<TransportView> transports) {
-		if(!principal){
-			if(!(transports == null))
-				this.transports = transports;
-			System.out.println("Secondary UpaBroker received message from primary UpaBroker");
-			goPrimary = false;
-		}
 	}
 	
 	public ArrayList<TransporterClient> getTransporters(){
@@ -209,7 +221,10 @@ public class BrokerPort implements BrokerPortType{
 			throw new UnavailableTransportFault_Exception("ERROR: Transporter Service doesn't know a given transport ID "+e.getMessage(), new UnavailableTransportFault());
 		} 
 		
-		secondaryBroker.updateBroker(transports);
+		//update secondaryBroker
+		//if(secondaryBroker != null)
+			//secondaryBroker.updateBroker(chosenRequest);
+		
 		return chosenRequest.getId();
 	}
 
@@ -239,7 +254,10 @@ public class BrokerPort implements BrokerPortType{
 
 	public void clearTransports() {
 		transports.clear();
-		secondaryBroker.updateBroker(transports);
+		
+		//update secondaryBroker
+		if(secondaryBroker != null)
+			secondaryBroker.clearTransports();
 	}
 	
 	/**
@@ -282,18 +300,40 @@ public class BrokerPort implements BrokerPortType{
 	 * Makes a search for TransporterServices available
 	 */
 	public void lookUpTransporterServices() throws JAXRException{
-		
-		for(UDDIRecord uddiRecord : endpointManager.getUddiNaming().listRecords("UpaTransporter%")){
-			System.out.println("Looking for transporterServices");
-			TransporterClient tc;
-			try {
-				System.out.println("Adding transporter "+uddiRecord.getOrgName() + " to available transporter services.");
-				tc = new TransporterClient(uddiRecord.getUrl(), uddiRecord.getOrgName());
-				transporterClients.add(tc);
-			} catch (TransporterClientException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		boolean dontAdd = false;
+		try{
+			UDDIRecord r1 = endpointManager.getUddiNaming().lookupRecord("UpaTransporter1");
+			TransporterClient tc = new TransporterClient(r1.getUrl(), r1.getOrgName());
+			try{
+				tc.ping("teste");
 			}
+			catch(Exception e){
+				e.printStackTrace();
+				System.out.println(r1.getOrgName() + "not operational");
+				dontAdd = true;
+			}
+			if(!dontAdd){
+				transporterClients.add(tc);
+				System.out.println("Adding transporter "+r1.getOrgName() + " to available transporter services.");
+			}
+			
+			dontAdd = false;
+			UDDIRecord r2 = endpointManager.getUddiNaming().lookupRecord("UpaTransporter2");
+			
+			tc = new TransporterClient(r2.getUrl(), r2.getOrgName());
+			try{
+				tc.ping("teste");
+			}
+			catch(Exception e){
+				System.out.println(r2.getOrgName() + "not operational");
+				dontAdd = true;
+			}
+			if(!dontAdd){
+				System.out.println("Adding transporter "+r2.getOrgName() + " to available transporter services.");
+				transporterClients.add(tc);
+			}
+		}catch(TransporterClientException e){
+			e.printStackTrace();
 		}
 	}
 	
@@ -311,5 +351,4 @@ public class BrokerPort implements BrokerPortType{
 		}
 		return null;
 	}
-	
 }	

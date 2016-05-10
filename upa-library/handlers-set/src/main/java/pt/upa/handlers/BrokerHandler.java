@@ -51,7 +51,6 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
     }
 
     public boolean handleMessage(SOAPMessageContext smc) {
-    	System.out.println("#------------------------------------------------------------------------#");
     	Boolean outbound = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
     	
     	try {
@@ -60,9 +59,11 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
 			e.printStackTrace();
 		}
     	if (outbound) {
-            handleOutgoingMsg(smc);
+    		System.out.println("->Handling outgoing message");
+           // handleOutgoingMsg(smc);
         } else {
-            handleIncomingMsg(smc);
+        	System.out.println("->Handling incoming message");
+           // handleIncomingMsg(smc);
         }
     	
         return true;
@@ -126,6 +127,7 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
             headerRandom.addTextNode(printBase64Binary(cipheredRandom));
             SOAPElement headerDigest = digest.addChildElement("CipheredDigest", SCHEMA_PREFIX);
             headerDigest.addTextNode(printBase64Binary(cipheredDigestMsg));
+            
 		} catch (Exception e1) {
 			System.out.println(e1.getMessage());
     		e1.printStackTrace();

@@ -25,7 +25,7 @@ import javax.jws.HandlerChain;
 	    targetNamespace="http://ws.transporter.upa.pt/",
 	    serviceName="TransporterService"
 	)
-@HandlerChain(file="/handler-chain.xml")
+@HandlerChain(file="/TransporterService_handler.xml")
 
 public class TransporterPort implements TransporterPortType{
 	private static final int ONE_SECOND = 1000;

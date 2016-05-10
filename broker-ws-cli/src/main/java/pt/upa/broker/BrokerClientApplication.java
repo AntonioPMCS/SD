@@ -1,23 +1,17 @@
-	package pt.upa.broker;
+package pt.upa.broker;
 
-import static javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY;
+import java.lang.reflect.InvocationTargetException;
+import java.net.ConnectException;
 
-import java.net.SocketTimeoutException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.WebServiceException;
+import com.sun.xml.ws.client.ClientTransportException;
 
 import pt.upa.broker.ws.InvalidPriceFault_Exception;
 import pt.upa.broker.ws.UnavailableTransportFault_Exception;
 import pt.upa.broker.ws.UnavailableTransportPriceFault_Exception;
 import pt.upa.broker.ws.UnknownLocationFault_Exception;
 import pt.upa.broker.ws.UnknownTransportFault_Exception;
-// classes generated from WSDL
-import pt.upa.broker.ws.cli.BrokerClient;;
-
+import pt.upa.broker.ws.cli.BrokerClient;
+import pt.upa.broker.ws.cli.BrokerClientException;
 
 public class BrokerClientApplication {
 
@@ -28,41 +22,12 @@ public class BrokerClientApplication {
 	private static final String PING = "type 'ping <word> to ping all known transporters";
 	private static final String VIEW = "type 'view <#transport id> to verify the status of a transport requested";
 	private static final String HELP = "type 'help' to review the commands";
-	private static final long TIME_TO_WAIT = 1000;
 	public static void showCommands(){
 		System.out.println(REQUEST);
 		System.out.println(VIEW);
 		System.out.println(HELP);
 		System.out.println(PING);
 		System.out.println(QUIT);
-	}
-	
-	public static void setTimeouts(BrokerClient client){
-		BindingProvider bindingProvider = (BindingProvider) client.getPort();
-        Map<String, Object> requestContext = bindingProvider.getRequestContext();
-
-        int connectionTimeout = 1;
-        // The connection timeout property has different names in different versions of JAX-WS
-        // Set them all to avoid compatibility issues
-        final List<String> CONN_TIME_PROPS = new ArrayList<String>();
-        CONN_TIME_PROPS.add("com.sun.xml.ws.connect.timeout");
-        CONN_TIME_PROPS.add("com.sun.xml.internal.ws.connect.timeout");
-        CONN_TIME_PROPS.add("javax.xml.ws.client.connectionTimeout");
-        // Set timeout until a connection is established (unit is milliseconds; 0 means infinite)
-        for (String propName : CONN_TIME_PROPS)
-            requestContext.put(propName, connectionTimeout);
-        System.out.printf("Set connection timeout to %d milliseconds%n", connectionTimeout);
-
-        int receiveTimeout = 2000;
-        // The receive timeout property has alternative names
-        // Again, set them all to avoid compability issues
-        final List<String> RECV_TIME_PROPS = new ArrayList<String>();
-        RECV_TIME_PROPS.add("com.sun.xml.ws.request.timeout");
-        RECV_TIME_PROPS.add("com.sun.xml.internal.ws.request.timeout");
-        RECV_TIME_PROPS.add("javax.xml.ws.client.receiveTimeout");
-        // Set timeout until the response is received (unit is milliseconds; 0 means infinite)
-        for (String propName : RECV_TIME_PROPS)
-            requestContext.put(propName, 1);
 	}
 	
 	public static void main(String[] args) throws Exception {
@@ -74,6 +39,7 @@ public class BrokerClientApplication {
 			System.err.println("Usage: java " + BrokerClientApplication.class.getName() + " wsURL OR uddiURL wsName");
 			return;
 		}
+		
 		String uddiURL = null;
 		String wsName = null;
 		String wsURL = null;
@@ -95,28 +61,20 @@ public class BrokerClientApplication {
 			client = new BrokerClient(uddiURL, wsName);
 		}
 		
-		int counter = 0;
+		
 		String input = "";
-		String order = null;
 		System.out.println(LIMITER);
 		System.out.println(GREETING);
 		showCommands();
 		System.out.println(LIMITER);
 		boolean quit = false;
-		setTimeouts(client);
-		boolean tryingAgain = false;
-		String previousCommand = null;
 		
+		//Client cycle
 		while(!quit){
 			input = System.console().readLine();
 			String[] command = input.split(" ");
 			try{
-				if(tryingAgain)
-					order = previousCommand; 
-				else
-					order = command[0];
-				
-				switch(order){
+				switch(command[0]){
 					case "request" : {
 						System.out.println(client.requestTransport(command[1], command[2], Integer.parseInt(command[3])));
 						break;
@@ -142,7 +100,6 @@ public class BrokerClientApplication {
 						System.out.println("ERROR: command inserted not known! type help.");
 					}
 				}
-				tryingAgain = false;
 			}catch(UnavailableTransportPriceFault_Exception e){
 				System.out.println(e.getMessage());
 			}catch(UnavailableTransportFault_Exception e){
@@ -153,35 +110,7 @@ public class BrokerClientApplication {
 				System.out.println(e.getMessage());
 			}catch(UnknownTransportFault_Exception e){
 				System.out.println(e.getMessage());
-			}catch(WebServiceException wse) {
-                Throwable cause = wse.getCause();
-                if (cause != null && cause instanceof SocketTimeoutException) {
-                    System.out.println("UpaBroker not responding...");
-                    //If third try already, then ask name server for UpaBroker service address
-                    if(counter == 3){
-                    	counter = 0;
-                    	tryingAgain = false;
-                    	
-                    	String newBrokerEndpoint = null;
-                    	
-                    	//ask name server
-                    	//There is only on service left with same name
-                    	for(String endpoint : client.getUDDINaming().list("UpaBroker")){
-                    			newBrokerEndpoint = endpoint;
-                    	}
-                    	client = new BrokerClient(newBrokerEndpoint);
-                    }
-                    else{
-                    	tryingAgain = true;
-                    	previousCommand = order;
-                    	counter++;
-                        System.out.println("Trying again in "+TIME_TO_WAIT+" ms!");
-                        Thread.sleep(TIME_TO_WAIT);
-                    }
-                }
-            }
-	
+			}
 		}
-
 	}
 }

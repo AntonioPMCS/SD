@@ -156,7 +156,6 @@ public class TransporterClient implements TransporterPortType{
 		BindingProvider bindingProvider = (BindingProvider) port;
 		Map<String, Object> requestContext = bindingProvider.getRequestContext();
 		requestContext.put(BrokerHandler.TRANSPORTER_NAME_PROPERTY, wsName);
-		requestContext.put("HELLO", "NADA");
 	}
 	
 }

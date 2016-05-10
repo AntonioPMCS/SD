@@ -118,11 +118,11 @@
             </xs:complexType>
             <xs:element name="clearTransportsResponse" type="tns:clearTransportsResponse" />
         
-        	<!-- New operation updateBroker -->
-        	<xs:complexType name="updateBroker">
-        		<xs:sequence >
-        			<xs:element name="transports" type="tns:transportView" minOccurs="0" maxOccurs="unbounded" />
-        		</xs:sequence>
+            <!-- New operation updateBroker -->
+            <xs:complexType name="updateBroker">
+		<xs:sequence >
+			<xs:element name="transport" type="tns:transportView" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
             </xs:complexType>
             <xs:element name="updateBroker" type="tns:updateBroker" />
         
@@ -130,6 +130,17 @@
                 <xs:sequence />
             </xs:complexType>
             <xs:element name="updateBrokerResponse" type="tns:updateBrokerResponse" />
+
+	    <!-- New operation sendAlive -->
+            <xs:complexType name="sendAlive">
+        	<xs:sequence />
+            </xs:complexType>
+            <xs:element name="sendAlive" type="tns:sendAlive" />
+        
+            <xs:complexType name="sendAliveResponse">
+                <xs:sequence />
+            </xs:complexType>
+            <xs:element name="sendAliveResponse" type="tns:sendAliveResponse" />
             
             
             <xs:complexType name="UnknownLocationFault">
@@ -208,11 +219,19 @@
     </message>
     
     <!-- New operation updateBroker -->
-	<message name="updateBroker">
+    <message name="updateBroker">
         <part name="parameters" element="tns:updateBroker" />
     </message>
     <message name="updateBrokerResponse">
         <part name="parameters" element="tns:updateBrokerResponse" />
+    </message>
+
+    <!-- New operation sendAlive -->
+    <message name="sendAlive">
+        <part name="parameters" element="tns:sendAlive" />
+    </message>
+    <message name="sendAliveResponse">
+        <part name="parameters" element="tns:sendAliveResponse" />
     </message>
     
     <message name="UnknownLocationFault">
@@ -297,6 +316,17 @@
                 wsam:Action="http://ws.broker.upa.pt/BrokerPort/updateBrokerResponse"
                 message="tns:updateBrokerResponse" />
         </operation>
+
+	<!-- New operation sendAlive -->
+        <operation name="sendAlive">
+            <input
+                wsam:Action="http://ws.broker.upa.pt/BrokerPort/sendAliveRequest"
+                message="tns:sendAlive" />
+            <output
+                wsam:Action="http://ws.broker.upa.pt/BrokerPort/sendAliveResponse"
+
+                message="tns:sendAliveResponse" />
+        </operation>
     </portType>
 
     <!-- SOAP/HTTP Binding -->
@@ -377,6 +407,20 @@
             <input>
                 <soap:body use="literal" />
             </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+        </operation>
+
+	<!-- New operation sendAlive -->
+        <operation name="sendAlive">
+        	<soap:operation soapAction="" />
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
         </operation>
     </binding>
 

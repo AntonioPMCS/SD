@@ -62,10 +62,7 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 
     public boolean handleMessage(SOAPMessageContext smc) {
     	String tName = (String) smc.get(TRANSPORTER_NAME_PROPERTY);
-    	if(tName.equals("UpaBroker"))
-    		return true;
     		
-    	System.out.println("#------------------------------------------------------------------------#");
     	Boolean outbound = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
     	try {
 			authority = new AuthorityClient("http://localhost:8086/ca-ws/endpoint");
@@ -74,13 +71,13 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 		}
         
     	if (outbound) {
-            System.out.println("Outbound SOAP message:");
+    		System.out.println("->Handling outgoing message");
             //logOperationType(smc);
-            handleOutgoingMsg(smc);
+           // handleOutgoingMsg(smc);
         } else {
-            System.out.println("Inbound SOAP message:");
+        	System.out.println("->Handling incoming message");
             //logOperationType(smc);
-            handleIncomingMsg(smc);
+            //handleIncomingMsg(smc);
         }
     	
         return true;
