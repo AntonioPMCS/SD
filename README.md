@@ -6,8 +6,6 @@ Grupo de SD .49 - Campus Alameda
 
 79715 António Silva
 
-70012 Filipe Cruzinha
-
 Repositório:
 [tecnico-distsys/C_49-project](https://github.com/tecnico-distsys/C_49-project/)
 
@@ -49,76 +47,108 @@ git clone https://github.com/tecnico-distsys/A_49-project.git
 
 [4] Instalar módulos de bibliotecas auxiliares
 
+
 ```
-cd uddi-naming
+cd uddi-naming -> UDDINaming1.1
 mvn clean install
 ```
 
 ```
-cd ...
+cd ca-ws-cli
 mvn clean install
 ```
 
+```
+cd upa-library
+mvn clean install
+```
+
+```
+cd transporter-cli
+mvn clean install
+```
+
+```
+cd broker-cli
+mvn clean install
+```
+
+
+-------------------------------------------------------------------------------
+### Serviço CENTRAL AUTHORITY
+[5] Construir e executar **servidor**
+```
+cd ca-ws
+mvn clean compile
+mvn exec:java
+mvn test
+```
+
+[6] Construir **cliente** e executar testes
+```
+cd transporter-ws
+mvn clean compile
+mvn verify
+```
 
 -------------------------------------------------------------------------------
 
 ### Serviço TRANSPORTER
 
-[1] Construir e executar **servidor**
+[7] Construir e executar **servidor par**
 
 ```
 cd transporter-ws
-mvn clean install
-mvn exec:java -Dws.i=x //'x' refere-se à instância que se deseja lançar
-		       //ex: mxn exec:java -Dws.i=1
-		       //default -> x=1
-mvn test               //para correr testes unitários
+mvn clean compile
+mvn exec:java 
+mvn test  -> para correr testes unitários
+```
+[8] Executar **servidor impar**
+
+```
+cd transporter-ws
+mvn exec:java -Dws.i=2
 ```
 
-[2] Construir **cliente** e executar testes
+[9] Construir **cliente** e executar testes
 
 ```
 cd transporter-ws-cli
-mvn clean install
-mvn exec:java       //para correr situação exempo
+mvn clean compile
+mvn exec:java       //para correr situação exemplo
 mvn verify          //para correr testes integração e de mock
-		    //ATENÇÃO: Lançar previamente dois Servidores Transporter-WS
-		    //com as seguintes flags:
-		    // -Dws.i=1
-                    // -Dws.i=2
+		    //ATENÇÃO: Lançar previamente dois Servidores Transporter-WS como indicado
 ```
-
-...
-
 
 -------------------------------------------------------------------------------
 
 ### Serviço BROKER
 
-[1] Construir e executar **servidor**
+[10] Construir e executar **servidor**
 
 ```
 cd broker-ws
-mvn clean install
+mvn clean compile
 mvn exec:java
 mvn test	//para correr testes unitários simples
 ```
 
+[11] Executar **servidor secundário**
+```
+cd broker-ws
+mvn exec:java -Dws.i=1
+```
 
-[2] Construir **cliente** e executar testes
+[12] Construir **cliente** e executar testes
 
 ```
 cd broker-ws-cli
-mvn clean install
+mvn clean compile
 mvn exec:java	//seguir instruções na command interface
 mvn verify      //para correr testes integração
-		//ATENÇÃO: Lançar previamente dois servidores transporter-WS
-	   	//com as seguintes flags:
-	   	// -Dws.i=1
-           	// -Dws.i=2
+		//ATENÇÃO: Lançar previamente dois servidores transporter-WS e os dois servidores brokers como indicado
 		//Lançar também um servidor broker-ws
 ```
-
 ...
 
 -------------------------------------------------------------------------------
