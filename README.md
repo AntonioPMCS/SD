@@ -53,10 +53,6 @@ cd uddi-naming -> UDDINaming1.1
 mvn clean install
 ```
 
-```
-cd ca-ws-cli
-mvn clean install
-```
 
 ```
 cd upa-library
@@ -81,14 +77,13 @@ mvn clean install
 cd ca-ws
 mvn clean compile
 mvn exec:java
-mvn test
 ```
 
-[6] Construir **cliente** e executar testes
+[6] Construir **cliente**  //ATENÇÃO: O servidor ca-ws fornece o WSDL por webservice, por isso tem de estar ligado)
 ```
-cd transporter-ws
-mvn clean compile
-mvn verify
+cd ca-ws-cli
+mvn clean install
+
 ```
 
 -------------------------------------------------------------------------------
