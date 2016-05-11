@@ -6,6 +6,7 @@ import java.net.ConnectException;
 import com.sun.xml.ws.client.ClientTransportException;
 
 import pt.upa.broker.ws.InvalidPriceFault_Exception;
+import pt.upa.broker.ws.TransportView;
 import pt.upa.broker.ws.UnavailableTransportFault_Exception;
 import pt.upa.broker.ws.UnavailableTransportPriceFault_Exception;
 import pt.upa.broker.ws.UnknownLocationFault_Exception;
@@ -18,15 +19,17 @@ public class BrokerClientApplication {
 	private static final String LIMITER = "######################################################";
 	private static final String GREETING = "Welcome to UPA application";
 	private static final String QUIT = "type 'quit' to exit...";
-	private static final String REQUEST = "type 'request <origin city> <destination city> <max price> to request a transportation";
-	private static final String PING = "type 'ping <word> to ping all known transporters";
-	private static final String VIEW = "type 'view <#transport id> to verify the status of a transport requested";
+	private static final String REQUEST = "type 'request <origin city> <destination city> <max price>' to request a transportation";
+	private static final String PING = "type 'ping <word>' to ping all known transporters";
+	private static final String VIEW = "type 'view <#transport id>' to verify the status of a transport requested";
+	private static final String LIST = "type 'list' to view all requested transports";
 	private static final String HELP = "type 'help' to review the commands";
 	public static void showCommands(){
 		System.out.println(REQUEST);
 		System.out.println(VIEW);
 		System.out.println(HELP);
 		System.out.println(PING);
+		System.out.println(LIST);
 		System.out.println(QUIT);
 	}
 	
@@ -89,6 +92,19 @@ public class BrokerClientApplication {
 					}
 					case "help" : {
 						showCommands();
+						break;
+					}
+					case "list" : {
+						System.out.println("------------------------------");
+						for(TransportView transport : client.listTransports()){
+							
+							System.out.println("---> "+transport.getId());
+							System.out.println("from : "+transport.getOrigin());
+							System.out.println("to : "+transport.getDestination());
+							System.out.println("price : "+transport.getPrice());
+							System.out.println("state : "+transport.getState());
+							System.out.println("company : "+transport.getTransporterCompany());
+						}
 						break;
 					}
 					case "quit" : {

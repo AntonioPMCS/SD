@@ -38,8 +38,7 @@ public class BrokerApplication {
 				endpoint = new EndpointManager(uddiURL, wsName, wsURL);
 				endpoint.setVerbose(true);
 				//TODO: descomentar o de baixo e apagar o outro logo aseguir
-				//port = new BrokerPort(wsName, endpoint, args[3]);
-				port = new BrokerPort(wsName, endpoint);
+				port = new BrokerPort(wsName, endpoint, args[3]);
 				principal = true;
 			}
 			else{

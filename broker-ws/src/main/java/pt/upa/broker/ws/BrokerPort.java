@@ -195,8 +195,11 @@ public class BrokerPort implements BrokerPortType{
 					JobView receivingJob;
 					
 					//Gets Job returned from decideJob()
-					if(transporter.getWsName().equals(chosenRequest.getTransporterCompany()))
+					if(transporter.getWsName().equals(chosenRequest.getTransporterCompany())){
+						System.out.println("Saying yes");
 						receivingJob = transporter.decideJob(chosenRequest.getId(), true);
+					}
+						
 					else{
 						TransportView request = getTransportViewByCompany(transporter.getWsName(), requests);
 						receivingJob = transporter.decideJob(request.getId(), false);

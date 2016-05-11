@@ -113,6 +113,7 @@ public class TransporterPort implements TransporterPortType{
 	 *         to decide on an already decided job.*/
 	@Override
 	public JobView decideJob(String id, boolean accept) throws BadJobFault_Exception {
+		System.out.println("Entering decide Job");
 		updateMsgContext();
 		if(jobStatus(id) != null){
 			
@@ -123,6 +124,7 @@ public class TransporterPort implements TransporterPortType{
 			for(JobView job : jobs){
 				if(job.getJobIdentifier().equals(id)){
 					if(accept){
+						System.out.println("Entering decide Job, accepting Job");
 						job.setJobState(JobStateView.ACCEPTED);
 						int delay = ThreadLocalRandom.current().nextInt(ONE_SECOND, FIVE_SECONDS + 1);
 						timer = new Timer();
@@ -143,12 +145,22 @@ public class TransporterPort implements TransporterPortType{
 
 	@Override
 	public JobView jobStatus(String id) {
-		updateMsgContext();
-		for(JobView job : jobs){
-			if(job.getJobIdentifier().equals(id)){
-				return job;
+		try{
+			updateMsgContext();
+			for(JobView job : jobs){
+				if(job.getJobIdentifier().equals(id)){
+					return job;
+				}
+			}
+		}catch(Exception e){
+			for(JobView job : jobs){
+				if(job.getJobIdentifier().equals(id)){
+					return job;
+				}
 			}
 		}
+		
+		
 		return null;
 	}
 

@@ -50,6 +50,7 @@ public class BrokerClient implements BrokerPortType{
 		this.wsURL = wsURL;
 		createStub();
 		setTimeouts();
+		setTransporterContext();
 	}
 
 	/** constructor with provided UDDI location and name */
