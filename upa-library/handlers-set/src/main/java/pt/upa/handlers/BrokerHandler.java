@@ -87,7 +87,7 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
             SOAPEnvelope se = sp.getEnvelope();
             
     		//Get Keystore
-    		String keystoreFilename = "./UpaBrokerSecurity/UpaBroker.jks";
+    		String keystoreFilename = "../broker-ws/UpaBrokerSecurity/UpaBroker.jks";
     	    FileInputStream fIn = new FileInputStream(keystoreFilename);
     	    KeyStore keystore = KeyStore.getInstance("JKS");
     	    keystore.load(fIn, BROKER_STORE_PASS.toCharArray());
@@ -200,7 +200,7 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
 			PublicKey tPubKey = tCert.getPublicKey();
 	    	
 			//Certificado do CA
-			String keystoreFilename = "./UpaBrokerSecurity/UpaBroker.jks";
+			String keystoreFilename = "../broker-ws/UpaBrokerSecurity/UpaBroker.jks";
     	    FileInputStream fIn = new FileInputStream(keystoreFilename);
     	    KeyStore keystore = KeyStore.getInstance("JKS");
     	    keystore.load(fIn, BROKER_STORE_PASS.toCharArray());

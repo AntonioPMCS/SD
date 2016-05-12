@@ -219,9 +219,8 @@ public class BrokerPort implements BrokerPortType{
 			throw new UnavailableTransportFault_Exception("ERROR: Transporter Service doesn't know a given transport ID "+e.getMessage(), new UnavailableTransportFault());
 		} 
 		
-		//update secondaryBroker
-		//if(secondaryBroker != null)
-			//secondaryBroker.updateBroker(chosenRequest);
+		if(secondaryBroker != null)
+			secondaryBroker.updateBroker(chosenRequest);
 		
 		return chosenRequest.getId();
 	}

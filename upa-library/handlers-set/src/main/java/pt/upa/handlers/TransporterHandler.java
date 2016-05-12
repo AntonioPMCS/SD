@@ -255,12 +255,14 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
 			if(!MessageDigest.isEqual(digestedMsg, decipheredDigestResult)){
 		        SOAPFault soapFault = sb.addFault();
 		        soapFault.setFaultString("Security Error: Message was tampered.");
+				message.saveChanges();
 		        throw new SOAPFaultException(soapFault);
 			}
 			
 			if(!MessageDigest.isEqual(digestedNounce, decipheredNounceResult)){
 				SOAPFault soapFault = sb.addFault();
 		        soapFault.setFaultString("Security Error: Message was tampered.");
+				message.saveChanges();
 		        throw new SOAPFaultException(soapFault);
     		}
 			else{
