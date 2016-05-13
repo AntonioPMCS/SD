@@ -322,10 +322,6 @@
             <input
                 wsam:Action="http://ws.broker.upa.pt/BrokerPort/sendAliveRequest"
                 message="tns:sendAlive" />
-            <output
-                wsam:Action="http://ws.broker.upa.pt/BrokerPort/sendAliveResponse"
-
-                message="tns:sendAliveResponse" />
         </operation>
     </portType>
 
