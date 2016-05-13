@@ -86,7 +86,7 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
     }
 
     public boolean handleFault(SOAPMessageContext smc) {
-        return true;
+        return false;
     }
 
     // nothing to clean up

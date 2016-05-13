@@ -165,26 +165,30 @@ public class BrokerClient implements BrokerPortType{
 	}
 	
 	public void treatException(WebServiceException wse){
-		Throwable cause = wse.getCause();
+	Throwable cause = wse.getCause();
         if (cause != null ) {// cause instanceof SocketTimeoutException){
             System.out.println("UpaBroker not responding...");
         	String newBrokerEndpoint = null;
         	
         	//There is only on service left with same name
         	try {
-        		
-				wsURL = uddiNaming.lookup(wsName);
-				System.out.println("Creating stub ...");
-				service = new BrokerService();
-				port = service.getBrokerPort();
-				System.out.println("Using service at: "+wsURL);
-				BindingProvider bindingProvider = (BindingProvider) port;
-				Map<String, Object> requestContext = bindingProvider.getRequestContext();
-				requestContext.put(ENDPOINT_ADDRESS_PROPERTY, wsURL);
-			} catch (JAXRException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+        		try {
+				Thread.sleep(1000);                 //1000 milliseconds is one second.
+			} catch(InterruptedException ex) {
+				Thread.currentThread().interrupt();
 			}
+			wsURL = uddiNaming.lookup(wsName);
+			System.out.println("Creating stub ...");
+			service = new BrokerService();
+			port = service.getBrokerPort();
+			System.out.println("Using service at: "+wsURL);
+			BindingProvider bindingProvider = (BindingProvider) port;
+			Map<String, Object> requestContext = bindingProvider.getRequestContext();
+			requestContext.put(ENDPOINT_ADDRESS_PROPERTY, wsURL);
+		} catch (JAXRException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         	
         }   
 	}

@@ -30,6 +30,7 @@ import pt.upa.ca.ws.cli.AuthorityClientException;
 import pt.upa.crypt.Cypher;
 import pt.upa.crypt.Digest;
 import pt.upa.crypt.SecureRandomGen;
+import javax.xml.ws.ProtocolException;
 
 
 import static javax.xml.bind.DatatypeConverter.parseBase64Binary;
@@ -51,22 +52,23 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
         return null;
     }
 
-    public boolean handleMessage(SOAPMessageContext smc)  {
+    public boolean handleMessage(SOAPMessageContext smc) {
     	System.out.println("#-----------------------------------------------#");
     	Boolean outbound = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
     	
     	try {
 		authority = new AuthorityClient("http://localhost:8086/ca-ws/endpoint");
+	
+		if (outbound) {
+		    System.out.println("->Handling outgoing message");
+		    handleOutgoingMsg(smc);
+		} else {
+		    System.out.println("->Handling incoming message");
+		    handleIncomingMsg(smc);
+		}
 	} catch (AuthorityClientException e) {
 		e.printStackTrace();
 	}
-    	if (outbound) {
-    		System.out.println("->Handling outgoing message");
-            handleOutgoingMsg(smc);
-        } else {
-	    System.out.println("->Handling incoming message");
-            handleIncomingMsg(smc);
-        }
     	
         return true;
     }
@@ -137,7 +139,7 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
             
 		} catch (Exception e1) {
 			System.out.println(e1.getMessage());
-    		e1.printStackTrace();
+			e1.printStackTrace();
 		} 
     }
     
@@ -145,113 +147,113 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
     	Map<String, String> headerElements = new HashMap<String, String>();
     	SOAPMessage message = smc.getMessage();
     	baos.reset();
-    	try{
-    		SOAPBody sb = message.getSOAPBody();
-    		SOAPHeader sh = message.getSOAPHeader();
-    		
-    		//Get Elements from header
-    		sh = message.getSOAPHeader();
-			@SuppressWarnings("rawtypes")
-			Iterator it = sh.getChildElements();
-			while(it.hasNext()){
-				
-				Node node=(Node)it.next();
-				NodeList list2 = node.getChildNodes();
-				
-				for(int i = 0; i < list2.getLength(); i++){
-					Element ele=(Element)node;
+	try {
+		SOAPBody sb = message.getSOAPBody();
+		SOAPHeader sh = message.getSOAPHeader();
+		
+		//Get Elements from header
+		sh = message.getSOAPHeader();
+		@SuppressWarnings("rawtypes")
+		Iterator it = sh.getChildElements();
+		while(it.hasNext()){
 			
-					headerElements.put(ele.getLocalName(), ele.getTextContent());
-				}
+			Node node=(Node)it.next();
+			NodeList list2 = node.getChildNodes();
+			
+			for(int i = 0; i < list2.getLength(); i++){
+				Element ele=(Element)node;
+		
+				headerElements.put(ele.getLocalName(), ele.getTextContent());
 			}
-			//Get Ciphered nounce
-			String cipherNounce = headerElements.get("CipherNounce");
+		}
+		//Get Ciphered nounce
+		String cipherNounce = headerElements.get("CipherNounce");
+		
+		//Get Nounce
+		String nounce = headerElements.get("Nounce");
+		
+		//Get Digest
+		String digest = headerElements.get("Digest");
+		
+		//Get TransporterName
+		String tName = headerElements.get("TransporterName");
+		
+		//Get Transporter Certificate from context
+		if(tName.equals("UpaTransporter1") && tCert1 == null){
+			System.out.println("Asked "+tName+" certificate to CA.");
+			byte[] brokerCertByteArray = authority.getTransporterCertificate(1);
+			CertificateFactory cf   = CertificateFactory.getInstance("X.509");
+			tCert1 = cf.generateCertificate(new ByteArrayInputStream(brokerCertByteArray));
+		}
+		else if(tName.equals("UpaTransporter2") && tCert2 == null){
+			System.out.println("Asked "+tName+" certificate to CA.");
+			byte[] brokerCertByteArray = authority.getTransporterCertificate(2);
+			CertificateFactory cf   = CertificateFactory.getInstance("X.509");
+			tCert2 = cf.generateCertificate(new ByteArrayInputStream(brokerCertByteArray));
+		}
+		
+		Certificate tCert = null;
+		if(tName.equals("UpaTransporter1")){
+			tCert = tCert1;
+		}
 			
-			//Get Nounce
-			String nounce = headerElements.get("Nounce");
-			
-			//Get Digest
-			String digest = headerElements.get("Digest");
-			
-			//Get TransporterName
-			String tName = headerElements.get("TransporterName");
-			
-			//Get Transporter Certificate from context
-			if(tName.equals("UpaTransporter1") && tCert1 == null){
-				System.out.println("Asked "+tName+" certificate to CA.");
-				byte[] brokerCertByteArray = authority.getTransporterCertificate(1);
-				CertificateFactory cf   = CertificateFactory.getInstance("X.509");
-				tCert1 = cf.generateCertificate(new ByteArrayInputStream(brokerCertByteArray));
-			}
-			else if(tName.equals("UpaTransporter2") && tCert2 == null){
-				System.out.println("Asked "+tName+" certificate to CA.");
-				byte[] brokerCertByteArray = authority.getTransporterCertificate(2);
-				CertificateFactory cf   = CertificateFactory.getInstance("X.509");
-				tCert2 = cf.generateCertificate(new ByteArrayInputStream(brokerCertByteArray));
-			}
-			
-			Certificate tCert = null;
-			if(tName.equals("UpaTransporter1")){
-				tCert = tCert1;
-			}
-				
-			else if(tName.equals("UpaTransporter2")){
-				tCert = tCert2;
-			}
-			
-			PublicKey tPubKey = tCert.getPublicKey();
-	    	
-			//Certificado do CA
-			String keystoreFilename = "../broker-ws/UpaBrokerSecurity/UpaBroker.jks";
-    	    FileInputStream fIn = new FileInputStream(keystoreFilename);
-    	    KeyStore keystore = KeyStore.getInstance("JKS");
-    	    keystore.load(fIn, BROKER_STORE_PASS.toCharArray());
-    	    Certificate caCertificate = keystore.getCertificate("ca");
-    	    PublicKey caPublicKey = caCertificate.getPublicKey();
-    	    
-    	    tCert.verify(caPublicKey);
-    	    
-    	    //Decipher nounce and digest
-    	    Cypher cypher = new Cypher();
-    	    byte[] digestResult = parseBase64Binary(digest);
-    	    byte[] nounceResult = parseBase64Binary(cipherNounce);
-    	    byte[] decipheredDigestResult = cypher.decipherWithPublicKey(digestResult, tPubKey);
-    	    byte[] decipheredNounceResult = cypher.decipherWithPublicKey(nounceResult, tPubKey);
-    	    
-    	    sh.removeContents();
-    	    message.saveChanges();
-    	    
-    	    message.writeTo(baos);
-			String convertedSoap = baos.toString();
-			
-			Digest digestor = new Digest();
-			byte[] digestedMsg = digestor.digestMessage(convertedSoap);
-			byte[] digestedNounce = digestor.digestMessage(nounce);
-			
-			//CHeck if they are equals
-			if(!MessageDigest.isEqual(digestedMsg, decipheredDigestResult)){
-		        SOAPFault soapFault = sb.addFault();
-		        soapFault.setFaultString("Security Error: Message was tampered.");
-		        throw new SOAPFaultException(soapFault);
-			}
-			if(!MessageDigest.isEqual(digestedNounce, decipheredNounceResult)){
+		else if(tName.equals("UpaTransporter2")){
+			tCert = tCert2;
+		}
+		
+		PublicKey tPubKey = tCert.getPublicKey();
+
+		//Certificado do CA
+		String keystoreFilename = "../broker-ws/UpaBrokerSecurity/UpaBroker.jks";
+		FileInputStream fIn = new FileInputStream(keystoreFilename);
+		KeyStore keystore = KeyStore.getInstance("JKS");
+		keystore.load(fIn, BROKER_STORE_PASS.toCharArray());
+		Certificate caCertificate = keystore.getCertificate("ca");
+		PublicKey caPublicKey = caCertificate.getPublicKey();
+		
+		tCert.verify(caPublicKey);
+		
+		//Decipher nounce and digest
+		Cypher cypher = new Cypher();
+		byte[] digestResult = parseBase64Binary(digest);
+		byte[] nounceResult = parseBase64Binary(cipherNounce);
+		byte[] decipheredDigestResult = cypher.decipherWithPublicKey(digestResult, tPubKey);
+		byte[] decipheredNounceResult = cypher.decipherWithPublicKey(nounceResult, tPubKey);
+		
+		sh.removeContents();
+		message.saveChanges();
+		
+		message.writeTo(baos);
+		String convertedSoap = baos.toString();
+		
+		Digest digestor = new Digest();
+		byte[] digestedMsg = digestor.digestMessage(convertedSoap);
+		byte[] digestedNounce = digestor.digestMessage(nounce);
+		
+		//CHeck if they are equals
+		if(!MessageDigest.isEqual(digestedMsg, decipheredDigestResult)){
+		SOAPFault soapFault = sb.addFault();
+		soapFault.setFaultString("Security Error: Message was tampered.");
+		throw new SOAPFaultException(soapFault);
+		}
+		if(!MessageDigest.isEqual(digestedNounce, decipheredNounceResult)){
+			SOAPFault soapFault = sb.addFault();
+			soapFault.setFaultString("Security Error: Message was tampered.");
+			throw new SOAPFaultException(soapFault); 
+		}
+		else{
+			if(storedNounces.contains(digestedNounce)){
 				SOAPFault soapFault = sb.addFault();
-				soapFault.setFaultString("Security Error: Message was tampered.");
-				throw new SOAPFaultException(soapFault); 
+				soapFault.setFaultString("Security Error: Message is repeated!.");
+				throw new SOAPFaultException(soapFault);
 			}
-			else{
-				if(storedNounces.contains(digestedNounce)){
-					SOAPFault soapFault = sb.addFault();
-					soapFault.setFaultString("Security Error: Message is repeated!.");
-					throw new SOAPFaultException(soapFault);
-				}
-				else
-					storedNounces.add(nounce);
-			  }
-			
-    	}catch (Exception e){
-    		System.out.println(e.getMessage());
-    		e.printStackTrace();
+			else
+				storedNounces.add(nounce);
+		}
+	} catch (Exception e) {
+		System.out.println(e.getMessage());
+		throw new ProtocolException(e.getMessage());
 	}
+
     }
 }

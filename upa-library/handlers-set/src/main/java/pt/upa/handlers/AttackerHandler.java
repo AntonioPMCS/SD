@@ -47,8 +47,25 @@ public class AttackerHandler implements SOAPHandler<SOAPMessageContext> {
 	}
 
 	 private void handleIncomingMsg(SOAPMessageContext smc) {
-
-	}
+		try {
+			SOAPMessage message = smc.getMessage();
+			SOAPBody sb = message.getSOAPBody();
+			@SuppressWarnings("rawtypes")
+			Iterator it = sb.getChildElements();
+			while(it.hasNext()){
+			
+				Node node=(Node)it.next();
+				NodeList childs=node.getChildNodes();
+				Element ele = (Element)node;
+				if ( ele.getLocalName().equals("ping") ) {
+					if (childs.item(0).getTextContent().equals("ATAQUEJA")) { attack=true; }
+				}
+			}
+		} catch (Exception e1) {
+			System.out.println(e1.getMessage());
+			e1.printStackTrace();
+		}
+	  }
 
 	 private void handleOutgoingMsg(SOAPMessageContext smc){
 	     SOAPMessage message = smc.getMessage();
@@ -83,9 +100,7 @@ public class AttackerHandler implements SOAPHandler<SOAPMessageContext> {
 			} finally {
 				attack=false;
 			}
-		} else {
-			attack=true;
-		} 
+		}
 	}
 }
 
