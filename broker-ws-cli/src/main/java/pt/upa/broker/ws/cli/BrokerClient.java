@@ -166,14 +166,14 @@ public class BrokerClient implements BrokerPortType{
 	
 	public void treatException(WebServiceException wse){
 		Throwable cause = wse.getCause();
-        if (cause != null && cause instanceof SocketTimeoutException){
+        if (cause != null ) {// cause instanceof SocketTimeoutException){
             System.out.println("UpaBroker not responding...");
         	String newBrokerEndpoint = null;
         	
         	//There is only on service left with same name
         	try {
         		
-				wsURL = uddiNaming.lookup("UpaBroker2");
+				wsURL = uddiNaming.lookup(wsName);
 				System.out.println("Creating stub ...");
 				service = new BrokerService();
 				port = service.getBrokerPort();

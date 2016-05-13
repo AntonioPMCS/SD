@@ -112,7 +112,15 @@ public class BrokerPort implements BrokerPortType{
 	 */
 	public void goPrimary(){
 		checkChange.cancel();
-		System.out.println("I just took over, i'm the primary!");
+		try { endpointManager.stop();
+			endpointManager.setName("UpaBroker");
+			endpointManager.start();
+			System.out.println("I just took over, i'm the primary!");
+		} catch (Exception e) {
+		  e.printStackTrace();
+		}
+		//unbind no UDDI-NAMING do nome do secundário
+		//rebind no UDDI-NAMING com o endpoint do secundario mas o nome do primario
 	}
 	
 	//================================== Domain Methods

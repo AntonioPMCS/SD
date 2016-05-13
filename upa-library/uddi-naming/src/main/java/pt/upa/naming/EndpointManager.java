@@ -58,6 +58,10 @@ public class EndpointManager {
 	public void setPort(Object portImpl){
 		this.portImpl = portImpl;
 	}
+	
+	public void setName(String wsName) {
+	  this.wsName=wsName;
+	}
 
 	/** constructor with provided web service URL */
 	public EndpointManager(String wsURL) {
@@ -75,6 +79,7 @@ public class EndpointManager {
 	public void start() throws Exception {
 		try {
 			// publish endpoint
+			if (portImpl == null) System.out.println("-----------------portImpl IS NULL ------------------__");
 			endpoint = Endpoint.create(this.portImpl);
 			if (verbose) {
 				System.out.printf("Starting %s%n", wsURL);
@@ -119,7 +124,7 @@ public class EndpointManager {
 				System.out.printf("Caught exception when stopping: %s%n", e);
 			}
 		}
-		this.portImpl = null;
+		//this.portImpl = null;
 		unpublishFromUDDI();
 	}
 
