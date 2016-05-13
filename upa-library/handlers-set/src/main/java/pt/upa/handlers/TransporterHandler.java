@@ -175,7 +175,6 @@ public class TransporterHandler implements SOAPHandler<SOAPMessageContext> {
     		SOAPHeader sh = message.getSOAPHeader();
     		
     		//Get Elements from header
-    		sh = message.getSOAPHeader();
 			@SuppressWarnings("rawtypes")
 			Iterator it = sh.getChildElements();
 			while(it.hasNext()){

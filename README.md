@@ -119,19 +119,19 @@ mvn verify          //para correr testes integração e de mock
 
 ### Serviço BROKER
 
-[10] Construir e executar **servidor**
+[10] Construir e executar **servidor secundário**
 
 ```
 cd broker-ws
 mvn clean compile
-mvn exec:java
+mvn exec:java -Dws.i=1
 mvn test	//para correr testes unitários simples
 ```
 
-[11] Executar **servidor secundário**
+[11] Executar **servidor primário**
 ```
 cd broker-ws
-mvn exec:java -Dws.i=1
+mvn exec:java
 ```
 
 [12] Construir **cliente** e executar testes

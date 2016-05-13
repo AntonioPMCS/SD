@@ -31,6 +31,7 @@ import pt.upa.crypt.Cypher;
 import pt.upa.crypt.Digest;
 import pt.upa.crypt.SecureRandomGen;
 
+
 import static javax.xml.bind.DatatypeConverter.parseBase64Binary;
 import static javax.xml.bind.DatatypeConverter.printBase64Binary;
 
@@ -50,20 +51,20 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
         return null;
     }
 
-    public boolean handleMessage(SOAPMessageContext smc) {
+    public boolean handleMessage(SOAPMessageContext smc)  {
     	System.out.println("#-----------------------------------------------#");
     	Boolean outbound = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
     	
     	try {
-			authority = new AuthorityClient("http://localhost:8086/ca-ws/endpoint");
-		} catch (AuthorityClientException e) {
-			e.printStackTrace();
-		}
+		authority = new AuthorityClient("http://localhost:8086/ca-ws/endpoint");
+	} catch (AuthorityClientException e) {
+		e.printStackTrace();
+	}
     	if (outbound) {
     		System.out.println("->Handling outgoing message");
             handleOutgoingMsg(smc);
         } else {
-        	System.out.println("->Handling incoming message");
+	    System.out.println("->Handling incoming message");
             handleIncomingMsg(smc);
         }
     	
@@ -71,7 +72,8 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
     }
 
     public boolean handleFault(SOAPMessageContext smc) {
-        return true;
+	System.out.println("----------------------------- ESTOU no handlefault ----------------------------------------- ");
+        return false;
     }
 
     // nothing to clean up
@@ -234,22 +236,22 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
 			}
 			if(!MessageDigest.isEqual(digestedNounce, decipheredNounceResult)){
 				SOAPFault soapFault = sb.addFault();
-		        soapFault.setFaultString("Security Error: Message was tampered.");
-		        throw new SOAPFaultException(soapFault);
-    		}
+				soapFault.setFaultString("Security Error: Message was tampered.");
+				throw new SOAPFaultException(soapFault); 
+			}
 			else{
 				if(storedNounces.contains(digestedNounce)){
 					SOAPFault soapFault = sb.addFault();
-			        soapFault.setFaultString("Security Error: Message is repeated!.");
-			        throw new SOAPFaultException(soapFault);
+					soapFault.setFaultString("Security Error: Message is repeated!.");
+					throw new SOAPFaultException(soapFault);
 				}
 				else
 					storedNounces.add(nounce);
-			}
+			  }
 			
     	}catch (Exception e){
     		System.out.println(e.getMessage());
     		e.printStackTrace();
-		}
+	}
     }
 }
