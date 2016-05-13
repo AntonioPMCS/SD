@@ -47,6 +47,7 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
 	private Certificate tCert1 = null;
 	private Certificate tCert2 = null;
 	private ArrayList<String> storedNounces = new ArrayList<String>();
+	String keystoreFilename = "../broker-ws/UpaBrokerSecurity/UpaBroker.jks";
 	
 	public Set<QName> getHeaders() {
         return null;
@@ -90,8 +91,8 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
     		SOAPPart sp = message.getSOAPPart();
             SOAPEnvelope se = sp.getEnvelope();
             
-    		//Get Keystore
-    		String keystoreFilename = "../broker-ws/UpaBrokerSecurity/UpaBroker.jks";
+	    //Get Keystore
+	   
     	    FileInputStream fIn = new FileInputStream(keystoreFilename);
     	    KeyStore keystore = KeyStore.getInstance("JKS");
     	    keystore.load(fIn, BROKER_STORE_PASS.toCharArray());
@@ -229,7 +230,6 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
 		Digest digestor = new Digest();
 		byte[] digestedMsg = digestor.digestMessage(convertedSoap);
 		byte[] digestedNounce = digestor.digestMessage(nounce);
-		
 		//CHeck if they are equals
 		if(!MessageDigest.isEqual(digestedMsg, decipheredDigestResult)){
 		SOAPFault soapFault = sb.addFault();
@@ -250,9 +250,10 @@ public class BrokerHandler implements SOAPHandler<SOAPMessageContext> {
 			else
 				storedNounces.add(nounce);
 		}
+	} catch (SOAPFaultException e1) {
+		 throw e1;
 	} catch (Exception e) {
 		System.out.println(e.getMessage());
-		throw new ProtocolException(e.getMessage());
 	}
 
     }

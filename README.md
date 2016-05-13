@@ -53,21 +53,11 @@ cd uddi-naming -> UDDINaming1.1
 mvn clean install
 ```
 
-
 ```
 cd upa-library
 mvn clean install
 ```
 
-```
-cd transporter-cli
-mvn clean install
-```
-
-```
-cd broker-cli
-mvn clean install
-```
 
 
 -------------------------------------------------------------------------------
@@ -79,7 +69,7 @@ mvn clean compile
 mvn exec:java
 ```
 
-[6] Construir **cliente**  //ATENÇÃO: O servidor ca-ws fornece o WSDL por webservice, por isso tem de estar ligado)
+[6] Construir **cliente**  //ATENÇÃO: O servidor ca-ws fornece o WSDL por webservice, por isso tem de estar ligado ao Juddi)
 ```
 cd ca-ws-cli
 mvn clean install
@@ -109,7 +99,7 @@ mvn exec:java -Dws.i=2
 
 ```
 cd transporter-ws-cli
-mvn clean compile
+mvn clean compile install
 mvn exec:java       //para correr situação exemplo
 mvn verify          //para correr testes integração e de mock
 		    //ATENÇÃO: Lançar previamente dois Servidores Transporter-WS como indicado
